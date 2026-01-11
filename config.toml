@@ -1,4 +1,5 @@
-baseURL = "https://yourusername.github.io/"
+baseURL = "https://mikelle.github.io/"
+enableRobotsTXT = true
 languageCode = "en-us"
 title = "Mikhail Wall"
 

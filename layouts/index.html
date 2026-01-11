@@ -211,7 +211,8 @@
     <div class="output">
         <div class="contact-row">
             <span class="contact-label">email</span>
-            <a href="mailto:{{ .Site.Params.email }}">{{ .Site.Params.email }}</a>
+            <a href="mailto:{{ .Site.Params.email }}" class="copy-email" data-email="{{ .Site.Params.email }}">{{ .Site.Params.email }}</a>
+            <span class="copy-toast">copied!</span>
         </div>
         <div class="contact-row">
             <span class="contact-label">github</span>

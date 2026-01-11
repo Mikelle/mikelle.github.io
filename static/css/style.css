@@ -612,6 +612,22 @@ a:hover {
     min-width: 80px;
 }
 
+.copy-email {
+    cursor: pointer;
+}
+
+.copy-toast {
+    color: var(--green);
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.copy-toast.show {
+    opacity: 1;
+}
+
 /* Footer */
 .footer {
     text-align: center;

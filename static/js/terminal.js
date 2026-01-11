@@ -40,6 +40,9 @@
         'bg matrix': { action: 'bg', target: 'matrix' },
         'bg scanlines': { action: 'bg', target: 'scanlines' },
         'bg none': { action: 'bg', target: 'none' },
+        // Dynamic commands
+        'date': { action: 'dynamic', key: 'date' },
+        'uptime': { action: 'dynamic', key: 'uptime' },
         // Easter eggs
         'sudo': { action: 'easter', key: 'sudo' },
         'sudo rm -rf /': { action: 'easter', key: 'sudo' },
@@ -112,6 +115,8 @@
         'bg matrix',
         'bg scanlines',
         'bg none',
+        'date',
+        'uptime',
         'clear'
     ];
 
@@ -150,6 +155,15 @@
         // Focus input only when clicking near the input area, not the whole page
         document.querySelector('.terminal-input-line')?.addEventListener('click', function(e) {
             input.focus();
+        });
+
+        // Press / to focus terminal input
+        document.addEventListener('keydown', function(e) {
+            if (e.key === '/' && document.activeElement !== input) {
+                e.preventDefault();
+                input.focus();
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         });
     }
 
@@ -220,6 +234,31 @@
         tabIndex = 0;
     }
 
+    function getDynamicOutput(key) {
+        if (key === 'date') {
+            const now = new Date();
+            const options = {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZoneName: 'short'
+            };
+            return now.toLocaleString('en-US', options);
+        }
+        if (key === 'uptime') {
+            const startYear = 2016;
+            const now = new Date();
+            const years = now.getFullYear() - startYear;
+            const days = Math.floor((now - new Date(startYear, 0, 1)) / (1000 * 60 * 60 * 24)) % 365;
+            return `coding for ${years} years, ${days} days\nstill no signs of stopping`;
+        }
+        return '';
+    }
+
     function executeCommand(cmd) {
         const command = commands[cmd];
 
@@ -255,6 +294,10 @@
                     setBackground(command.target);
                     showOutput(`background set to ${command.target}`, 'success');
                 }
+                break;
+            case 'dynamic':
+                const result = getDynamicOutput(command.key);
+                showOutput(result, 'help');
                 break;
             case 'easter':
                 const eggKey = command.key;

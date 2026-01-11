@@ -35,10 +35,30 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         updateToggleIcon();
         initActiveNav();
+        initCopyEmail();
     });
 } else {
     updateToggleIcon();
     initActiveNav();
+    initCopyEmail();
+}
+
+// Copy email on click
+function initCopyEmail() {
+    const emailLink = document.querySelector('.copy-email');
+    const toast = document.querySelector('.copy-toast');
+
+    if (!emailLink || !toast) return;
+
+    emailLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        const email = this.dataset.email;
+
+        navigator.clipboard.writeText(email).then(() => {
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        });
+    });
 }
 
 // Highlight active nav section on scroll
