@@ -20,6 +20,8 @@
         'blog': { action: 'scroll', target: 'blog' },
         'tail -n 3 notes.log': { action: 'scroll', target: 'notes' },
         'notes': { action: 'scroll', target: 'notes' },
+        'cat .interests': { action: 'scroll', target: 'interests' },
+        'interests': { action: 'scroll', target: 'interests' },
         'cat .contact': { action: 'scroll', target: 'contact' },
         'contact': { action: 'scroll', target: 'contact' },
         'clear': { action: 'clear' },
@@ -88,6 +90,7 @@
         'git log',
         'find ~/projects',
         'ls blog/',
+        'cat .interests',
         'cat .contact',
         'cd blog',
         'cd notes',
@@ -104,6 +107,7 @@
   git log         - work experience
   find ~/projects - projects
   ls blog/        - blog posts
+  cat .interests  - life outside code
   cat .contact    - contact info
   cd blog         - go to blog
   cd notes        - go to notes
