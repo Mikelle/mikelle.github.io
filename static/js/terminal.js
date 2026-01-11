@@ -147,15 +147,10 @@
 
         input.addEventListener('keydown', handleKeydown);
 
-        // Focus input when clicking anywhere in terminal body
-        document.querySelector('.terminal-body')?.addEventListener('click', function(e) {
-            if (!e.target.closest('a') && !e.target.closest('input')) {
-                input.focus();
-            }
+        // Focus input only when clicking near the input area, not the whole page
+        document.querySelector('.terminal-input-line')?.addEventListener('click', function(e) {
+            input.focus();
         });
-
-        // Initial focus (with small delay for page load)
-        setTimeout(() => input.focus(), 100);
     }
 
     function handleKeydown(e) {
