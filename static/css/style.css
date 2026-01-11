@@ -1,5 +1,6 @@
 :root {
     --bg: #0d1117;
+    --bg-secondary: #161b22;
     --text: #c9d1d9;
     --text-dim: #a0a8b2;
     --green: #3fb950;
@@ -7,7 +8,22 @@
     --purple: #bc8cff;
     --yellow: #d29922;
     --cyan: #39c5cf;
+    --red: #f85149;
     --border: #30363d;
+}
+
+[data-theme="light"] {
+    --bg: #ffffff;
+    --bg-secondary: #f6f8fa;
+    --text: #24292f;
+    --text-dim: #57606a;
+    --green: #1a7f37;
+    --blue: #0969da;
+    --purple: #8250df;
+    --yellow: #9a6700;
+    --cyan: #1b7c83;
+    --red: #cf222e;
+    --border: #d0d7de;
 }
 
 * {
@@ -54,7 +70,7 @@ a:hover {
 .terminal-header {
     position: sticky;
     top: 0;
-    background: #161b22;
+    background: var(--bg-secondary);
     padding: 0.75rem 1.5rem;
     display: flex;
     align-items: center;
@@ -95,6 +111,20 @@ a:hover {
 .terminal-nav a:hover {
     color: var(--green);
     text-decoration: none;
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.25rem;
+    transition: color 0.15s;
+}
+
+.theme-toggle:hover {
+    color: var(--yellow);
 }
 
 .terminal-body {
@@ -400,14 +430,14 @@ a:hover {
 }
 
 .article-body code {
-    background: #161b22;
+    background: var(--bg-secondary);
     padding: 0.2rem 0.4rem;
     border-radius: 3px;
     font-size: 0.9em;
 }
 
 .article-body pre {
-    background: #161b22;
+    background: var(--bg-secondary);
     padding: 1rem;
     border-radius: 6px;
     overflow-x: auto;
@@ -493,7 +523,7 @@ a:hover {
 }
 
 .terminal-output.error {
-    color: #f85149;
+    color: var(--red);
 }
 
 .terminal-output.help {

@@ -29,6 +29,11 @@
         'cd notes': { action: 'navigate', target: '/notes/' },
         'cd ~': { action: 'navigate', target: '/' },
         'cd': { action: 'navigate', target: '/' },
+        // Theme
+        'theme light': { action: 'theme', target: 'light' },
+        'theme dark': { action: 'theme', target: 'dark' },
+        'light': { action: 'theme', target: 'light' },
+        'dark': { action: 'theme', target: 'dark' },
         // Easter eggs
         'sudo': { action: 'easter', key: 'sudo' },
         'sudo rm -rf /': { action: 'easter', key: 'sudo' },
@@ -94,6 +99,8 @@
         'cat .contact',
         'cd blog',
         'cd notes',
+        'theme light',
+        'theme dark',
         'clear'
     ];
 
@@ -111,6 +118,8 @@
   cat .contact    - contact info
   cd blog         - go to blog
   cd notes        - go to notes
+  theme light     - switch to light mode
+  theme dark      - switch to dark mode
   clear           - clear & scroll top
   help            - show this message`;
 
@@ -228,6 +237,12 @@
                 break;
             case 'help':
                 showOutput(helpText, 'help');
+                break;
+            case 'theme':
+                if (typeof setTheme === 'function') {
+                    setTheme(command.target);
+                    showOutput(`theme set to ${command.target}`, 'success');
+                }
                 break;
             case 'easter':
                 const eggKey = command.key;
