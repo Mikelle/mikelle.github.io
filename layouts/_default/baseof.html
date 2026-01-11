@@ -4,11 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ if .IsHome }}mikhail@wall:~${{ else }}{{ .Title }} | Mikhail Wall{{ end }}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+    <!-- Meta -->
+    <meta name="description" content="{{ if .Description }}{{ .Description }}{{ else }}Protocol Engineer. L2 infrastructure, MEV, DeFi. Building at Infrared Finance.{{ end }}">
+    <meta name="author" content="Mikhail Wall">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="{{ if .IsHome }}Mikhail Wall - Protocol Engineer{{ else }}{{ .Title }} | Mikhail Wall{{ end }}">
+    <meta property="og:description" content="{{ if .Description }}{{ .Description }}{{ else }}Protocol Engineer. L2 infrastructure, MEV, DeFi.{{ end }}">
+    <meta property="og:type" content="{{ if .IsHome }}website{{ else }}article{{ end }}">
+    <meta property="og:url" content="{{ .Permalink }}">
+    <meta property="og:image" content="{{ .Site.BaseURL }}og-image.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@mikhwall">
+    <meta name="twitter:title" content="{{ if .IsHome }}Mikhail Wall - Protocol Engineer{{ else }}{{ .Title }}{{ end }}">
+    <meta name="twitter:description" content="{{ if .Description }}{{ .Description }}{{ else }}Protocol Engineer. L2 infrastructure, MEV, DeFi.{{ end }}">
+    <meta name="twitter:image" content="{{ .Site.BaseURL }}og-image.png">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
     <script src="/js/theme.js"></script>
+    <script src="/js/background.js"></script>
 </head>
 <body>
     <div class="terminal">

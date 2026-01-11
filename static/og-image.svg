@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0d1117"/>
+
+  <!-- Terminal window -->
+  <rect x="60" y="60" width="1080" height="510" rx="12" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+
+  <!-- Title bar -->
+  <rect x="60" y="60" width="1080" height="40" rx="12" fill="#161b22"/>
+  <rect x="60" y="88" width="1080" height="12" fill="#161b22"/>
+
+  <!-- Traffic lights -->
+  <circle cx="90" cy="80" r="7" fill="#f85149"/>
+  <circle cx="115" cy="80" r="7" fill="#d29922"/>
+  <circle cx="140" cy="80" r="7" fill="#3fb950"/>
+
+  <!-- Title -->
+  <text x="180" y="85" font-family="monospace" font-size="14" fill="#6e7681">mikhail@wall:~</text>
+
+  <!-- Terminal border line -->
+  <line x1="60" y1="100" x2="1140" y2="100" stroke="#30363d" stroke-width="1"/>
+
+  <!-- Content -->
+  <!-- Prompt 1 -->
+  <text x="90" y="150" font-family="monospace" font-size="20" fill="#3fb950">~$</text>
+  <text x="130" y="150" font-family="monospace" font-size="20" fill="#c9d1d9">whoami</text>
+
+  <!-- Name -->
+  <text x="90" y="195" font-family="monospace" font-size="32" font-weight="bold" fill="#c9d1d9">Mikhail Wall</text>
+
+  <!-- Role -->
+  <text x="90" y="235" font-family="monospace" font-size="20" fill="#a0a8b2">Protocol Engineer. L2 infrastructure, MEV, DeFi.</text>
+
+  <!-- Prompt 2 -->
+  <text x="90" y="300" font-family="monospace" font-size="20" fill="#3fb950">~$</text>
+  <text x="130" y="300" font-family="monospace" font-size="20" fill="#c9d1d9">cat</text>
+  <text x="175" y="300" font-family="monospace" font-size="20" fill="#39c5cf">skills.txt</text>
+
+  <!-- Skills -->
+  <text x="90" y="345" font-family="monospace" font-size="18" fill="#58a6ff">Golang</text>
+  <text x="180" y="345" font-family="monospace" font-size="18" fill="#a0a8b2">•</text>
+  <text x="205" y="345" font-family="monospace" font-size="18" fill="#58a6ff">Solidity</text>
+  <text x="320" y="345" font-family="monospace" font-size="18" fill="#a0a8b2">•</text>
+  <text x="345" y="345" font-family="monospace" font-size="18" fill="#58a6ff">TypeScript</text>
+  <text x="485" y="345" font-family="monospace" font-size="18" fill="#a0a8b2">•</text>
+  <text x="510" y="345" font-family="monospace" font-size="18" fill="#58a6ff">Rust</text>
+  <text x="580" y="345" font-family="monospace" font-size="18" fill="#a0a8b2">•</text>
+  <text x="605" y="345" font-family="monospace" font-size="18" fill="#58a6ff">Python</text>
+
+  <!-- Experience prompt -->
+  <text x="90" y="390" font-family="monospace" font-size="20" fill="#3fb950">~$</text>
+  <text x="130" y="390" font-family="monospace" font-size="20" fill="#c9d1d9">git log</text>
+  <text x="230" y="390" font-family="monospace" font-size="20" fill="#d29922">--oneline</text>
+  <text x="360" y="390" font-family="monospace" font-size="20" fill="#39c5cf">career</text>
+
+  <!-- Current -->
+  <text x="90" y="430" font-family="monospace" font-size="16" fill="#3fb950">Infrared Finance</text>
+  <text x="270" y="430" font-family="monospace" font-size="16" fill="#a0a8b2">← now</text>
+
+  <!-- Previous -->
+  <text x="90" y="460" font-family="monospace" font-size="16" fill="#d29922">Polygon</text>
+  <text x="180" y="460" font-family="monospace" font-size="16" fill="#a0a8b2">•</text>
+  <text x="200" y="460" font-family="monospace" font-size="16" fill="#d29922">Primev</text>
+  <text x="280" y="460" font-family="monospace" font-size="16" fill="#a0a8b2">•</text>
+  <text x="300" y="460" font-family="monospace" font-size="16" fill="#d29922">Anboto Labs</text>
+
+  <!-- URL -->
+  <text x="90" y="520" font-family="monospace" font-size="16" fill="#6e7681">mikelle.github.io</text>
+</svg>

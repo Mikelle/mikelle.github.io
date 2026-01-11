@@ -34,6 +34,12 @@
         'theme dark': { action: 'theme', target: 'dark' },
         'light': { action: 'theme', target: 'light' },
         'dark': { action: 'theme', target: 'dark' },
+        // Background
+        'bg grid': { action: 'bg', target: 'grid' },
+        'bg particles': { action: 'bg', target: 'particles' },
+        'bg matrix': { action: 'bg', target: 'matrix' },
+        'bg scanlines': { action: 'bg', target: 'scanlines' },
+        'bg none': { action: 'bg', target: 'none' },
         // Easter eggs
         'sudo': { action: 'easter', key: 'sudo' },
         'sudo rm -rf /': { action: 'easter', key: 'sudo' },
@@ -101,6 +107,11 @@
         'cd notes',
         'theme light',
         'theme dark',
+        'bg grid',
+        'bg particles',
+        'bg matrix',
+        'bg scanlines',
+        'bg none',
         'clear'
     ];
 
@@ -242,6 +253,12 @@
                 if (typeof setTheme === 'function') {
                     setTheme(command.target);
                     showOutput(`theme set to ${command.target}`, 'success');
+                }
+                break;
+            case 'bg':
+                if (typeof setBackground === 'function') {
+                    setBackground(command.target);
+                    showOutput(`background set to ${command.target}`, 'success');
                 }
                 break;
             case 'easter':

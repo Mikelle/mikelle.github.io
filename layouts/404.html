@@ -1,0 +1,26 @@
+{{ define "main" }}
+<section class="section" style="min-height: 60vh; display: flex; flex-direction: column; justify-content: center;">
+    <div class="cmd-line">
+        <span class="prompt">~$</span> <span class="command">cd</span> <span class="string">/unknown</span>
+    </div>
+    <div class="output" style="margin-top: 1rem;">
+        <div style="color: var(--red); margin-bottom: 1rem;">
+            bash: cd: No such file or directory
+        </div>
+        <div style="color: var(--text-dim); margin-bottom: 2rem;">
+            Error 404 — page not found
+        </div>
+        <div class="cmd-line">
+            <span class="prompt">~$</span> <span class="command">ls</span> <span class="string">available/</span>
+        </div>
+        <div style="margin-top: 1rem;">
+            <a href="/" style="margin-right: 2rem;">~/home</a>
+            <a href="/blog/" style="margin-right: 2rem;">~/blog</a>
+            <a href="/notes/">~/notes</a>
+        </div>
+    </div>
+    <div class="cmd-line" style="margin-top: 3rem;">
+        <span class="prompt">~$</span> <a href="/" style="color: var(--green);">cd ~</a>
+    </div>
+</section>
+{{ end }}

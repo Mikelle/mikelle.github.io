@@ -26,6 +26,102 @@
     --border: #d0d7de;
 }
 
+/* Background Effects */
+.bg-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.4;
+}
+
+/* Grid Background */
+[data-bg="grid"] .terminal::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.3;
+    animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    [data-bg="grid"] .terminal::before {
+        animation: none;
+    }
+    .cursor {
+        animation: none;
+        opacity: 1;
+    }
+}
+
+/* Scanlines */
+[data-bg="scanlines"] .terminal::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1) 0px,
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    opacity: 0.5;
+}
+
+[data-bg="scanlines"] .exp-company,
+[data-bg="scanlines"] .project-name,
+[data-bg="scanlines"] a {
+    text-shadow: 0 0 10px currentColor;
+}
+
+/* Matrix canvas handled by JS */
+#matrix-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.15;
+}
+
+/* Particles canvas */
+#particles-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.4;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -98,19 +194,47 @@ a:hover {
 .terminal-nav {
     margin-left: auto;
     display: flex;
-    gap: 1.5rem;
+    gap: 0;
 }
 
 .terminal-nav a {
     color: var(--text-dim);
     font-size: 0.75rem;
     text-decoration: none;
-    transition: color 0.15s;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid transparent;
+    border-bottom: none;
+    transition: all 0.15s;
+    position: relative;
+}
+
+.terminal-nav a::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 25%;
+    height: 50%;
+    width: 1px;
+    background: var(--border);
+}
+
+.terminal-nav a:last-child::after {
+    display: none;
 }
 
 .terminal-nav a:hover {
     color: var(--green);
+    background: var(--bg);
+    border-color: var(--border);
+    border-radius: 4px 4px 0 0;
     text-decoration: none;
+}
+
+.terminal-nav a.active {
+    color: var(--green);
+    background: var(--bg);
+    border-color: var(--border);
+    border-radius: 4px 4px 0 0;
 }
 
 .theme-toggle {
@@ -120,11 +244,22 @@ a:hover {
     cursor: pointer;
     font-size: 1rem;
     padding: 0.25rem;
+    margin-left: 1rem;
     transition: color 0.15s;
 }
 
 .theme-toggle:hover {
     color: var(--yellow);
+}
+
+/* Separator before theme toggle */
+.terminal-nav::after {
+    content: '';
+    width: 1px;
+    height: 50%;
+    background: var(--border);
+    align-self: center;
+    margin-left: 0.5rem;
 }
 
 .terminal-body {
