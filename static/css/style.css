@@ -1,7 +1,7 @@
 :root {
     --bg: #0d1117;
     --text: #c9d1d9;
-    --text-dim: #6e7681;
+    --text-dim: #a0a8b2;
     --green: #3fb950;
     --blue: #58a6ff;
     --purple: #bc8cff;
@@ -457,6 +457,51 @@ a:hover {
     margin-top: 1rem;
 }
 
+/* Terminal Input */
+.terminal-input-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.terminal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: inherit;
+    outline: none;
+    caret-color: var(--green);
+}
+
+.terminal-input::placeholder {
+    color: var(--text-dim);
+    opacity: 0.5;
+}
+
+.terminal-output {
+    display: none;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
+    white-space: pre-wrap;
+    font-size: 0.9rem;
+}
+
+.terminal-output.success {
+    color: var(--green);
+}
+
+.terminal-output.error {
+    color: #f85149;
+}
+
+.terminal-output.help {
+    color: var(--text-dim);
+    border-left: 2px solid var(--border);
+    padding-left: 1rem;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
     .terminal-body {
@@ -469,5 +514,13 @@ a:hover {
 
     .exp-header {
         flex-direction: column;
+    }
+
+    .terminal-input-line {
+        display: none;
+    }
+
+    .terminal-output {
+        display: none !important;
     }
 }
