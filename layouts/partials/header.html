@@ -1,7 +1,9 @@
 <div class="terminal-header">
-    <div class="terminal-btn red"></div>
-    <div class="terminal-btn yellow"></div>
-    <div class="terminal-btn green"></div>
+    <div class="terminal-controls">
+        <span class="control-btn">[<span class="ctrl-char">_</span>]</span>
+        <span class="control-btn">[<span class="ctrl-char">□</span>]</span>
+        <span class="control-btn close-btn">[<span class="ctrl-char">×</span>]</span>
+    </div>
     <span class="terminal-title">{{ if .IsHome }}mikhail@wall:~{{ else }}{{ .Title }}{{ end }}</span>
     <nav class="terminal-nav">
         {{ if .IsHome }}
@@ -9,7 +11,7 @@
             <a href="{{ .URL }}">{{ .Name }}</a>
             {{ end }}
         {{ else }}
-            <a href="/">← back</a>
+            <a href="/">← cd ~</a>
         {{ end }}
     </nav>
 </div>
