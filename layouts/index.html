@@ -143,50 +143,50 @@
 </section>
 
 <!-- Blog -->
+{{ $blogPages := where .Site.RegularPages "Section" "blog" }}
+{{ if $blogPages }}
 <section class="section">
     <div class="cmd-line">
         <span class="prompt">~$</span> <span class="command">ls</span> <span class="string">blog/</span>
     </div>
     <div class="output">
-        {{ range first 3 (where .Site.RegularPages "Section" "blog") }}
+        {{ range first 3 $blogPages }}
         <div class="blog-item">
             <span class="blog-status">[{{ if .Draft }}draft{{ else }}{{ .Date.Format "01.06" }}{{ end }}]</span>
             <span class="blog-title"><a href="{{ .Permalink }}">{{ .Title }}</a></span>
         </div>
-        {{ else }}
-        <div class="blog-item">
-            <span class="blog-status">[draft]</span>
-            <span class="blog-title">Coming soon...</span>
-        </div>
         {{ end }}
+        {{ if gt (len $blogPages) 3 }}
         <div style="margin-top: 1rem;">
             <a href="/blog/">more →</a>
         </div>
+        {{ end }}
     </div>
 </section>
+{{ end }}
 
 <!-- Notes preview -->
+{{ $notesPages := where .Site.RegularPages "Section" "notes" }}
+{{ if $notesPages }}
 <section class="section">
     <div class="cmd-line">
         <span class="prompt">~$</span> <span class="command">tail</span> <span class="flag">-n 3</span> <span class="string">notes.log</span>
     </div>
     <div class="output">
-        {{ range first 3 (where .Site.RegularPages "Section" "notes") }}
+        {{ range first 3 $notesPages }}
         <div class="blog-item">
             <span class="blog-status">[{{ .Date.Format "01.06" }}]</span>
             <span class="blog-title"><a href="{{ .Permalink }}">{{ .Title }}</a></span>
         </div>
-        {{ else }}
-        <div class="blog-item">
-            <span class="blog-status">[01.25]</span>
-            <span class="blog-title">Coming soon...</span>
-        </div>
         {{ end }}
+        {{ if gt (len $notesPages) 3 }}
         <div style="margin-top: 1rem;">
             <a href="/notes/">more →</a>
         </div>
+        {{ end }}
     </div>
 </section>
+{{ end }}
 
 <!-- Contact -->
 <section id="contact" class="section">
