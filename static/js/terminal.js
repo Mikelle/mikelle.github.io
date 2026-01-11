@@ -26,8 +26,74 @@
         'cd blog': { action: 'navigate', target: '/blog/' },
         'cd notes': { action: 'navigate', target: '/notes/' },
         'cd ~': { action: 'navigate', target: '/' },
-        'cd': { action: 'navigate', target: '/' }
+        'cd': { action: 'navigate', target: '/' },
+        // Easter eggs
+        'sudo': { action: 'easter', key: 'sudo' },
+        'sudo rm -rf /': { action: 'easter', key: 'sudo' },
+        'rm -rf /': { action: 'easter', key: 'rm' },
+        'exit': { action: 'easter', key: 'exit' },
+        'vim': { action: 'easter', key: 'vim' },
+        'emacs': { action: 'easter', key: 'emacs' },
+        'nano': { action: 'easter', key: 'nano' },
+        'coffee': { action: 'easter', key: 'coffee' },
+        'make coffee': { action: 'easter', key: 'coffee' },
+        'ping': { action: 'easter', key: 'ping' },
+        'hello': { action: 'easter', key: 'hello' },
+        'hi': { action: 'easter', key: 'hello' },
+        'ls -la': { action: 'easter', key: 'lsla' },
+        'pwd': { action: 'easter', key: 'pwd' },
+        'fortune': { action: 'easter', key: 'fortune' },
+        'sl': { action: 'easter', key: 'sl' },
+        'man': { action: 'easter', key: 'man' },
+        'hire': { action: 'easter', key: 'hire' },
+        'hire me': { action: 'easter', key: 'hire' }
     };
+
+    const easterEggs = {
+        'sudo': 'nice try. no root for you.',
+        'rm': '🔥 just kidding, this is a static site.',
+        'exit': 'there is no escape. try closing the tab.',
+        'vim': 'error: you are now trapped. good luck.',
+        'emacs': 'M-x butterfly... just kidding, use vim.',
+        'nano': 'finally, someone with taste.',
+        'coffee': '☕ brewing caffeine.exe...\n[==========>         ] 50%\njust kidding, go touch grass.',
+        'ping': 'pong',
+        'hello': 'hey there 👋',
+        'lsla': 'drwxr-xr-x  mikhail mass_code\n-rw-r--r--  mikhail mass_bugs\n-rw-r--r--  mikhail mass_coffee',
+        'pwd': '/home/mikhail/trying-to-look-cool',
+        'fortune': null, // handled specially
+        'sl': '🚂 choo choo! (you meant ls)',
+        'man': 'this man needs mass sleep.',
+        'hire': '📧 mikhwall@gmail.com\nlet\'s build something cool.'
+    };
+
+    const fortunes = [
+        '"Any fool can write code that a computer can understand. Good programmers write code that humans can understand." - Martin Fowler',
+        '"First, solve the problem. Then, write the code." - John Johnson',
+        'bugs are just mass features in disguise.',
+        '"It works on my machine." - Every Developer',
+        '"There are only two hard things in CS: cache invalidation, naming things, and off-by-one errors."',
+        'git push --force is never the answer. except when it is.',
+        'console.log("here") console.log("here2") console.log("why") - You, debugging'
+    ];
+
+    // Commands shown in tab completion (canonical forms)
+    const completions = [
+        'help',
+        'whoami',
+        'cat README.md',
+        'ls skills/',
+        'git log',
+        'find ~/projects',
+        'ls blog/',
+        'cat .contact',
+        'cd blog',
+        'cd notes',
+        'clear'
+    ];
+
+    let tabMatches = [];
+    let tabIndex = 0;
 
     const helpText = `Available commands:
   whoami          - about me
@@ -67,7 +133,10 @@
     }
 
     function handleKeydown(e) {
-        if (e.key === 'Enter') {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            handleTabCompletion();
+        } else if (e.key === 'Enter') {
             e.preventDefault();
             const cmd = input.value.trim().toLowerCase();
             if (cmd) {
@@ -77,12 +146,14 @@
             }
             input.value = '';
             historyIndex = -1;
+            resetTabState();
         } else if (e.key === 'ArrowUp') {
             e.preventDefault();
             if (historyIndex < history.length - 1) {
                 historyIndex++;
                 input.value = history[historyIndex];
             }
+            resetTabState();
         } else if (e.key === 'ArrowDown') {
             e.preventDefault();
             if (historyIndex > 0) {
@@ -92,7 +163,40 @@
                 historyIndex = -1;
                 input.value = '';
             }
+            resetTabState();
+        } else {
+            // Reset tab state on any other key
+            resetTabState();
         }
+    }
+
+    function handleTabCompletion() {
+        const current = input.value.trim().toLowerCase();
+
+        // If we're cycling through existing matches
+        if (tabMatches.length > 0 && current === tabMatches[tabIndex].toLowerCase()) {
+            tabIndex = (tabIndex + 1) % tabMatches.length;
+            input.value = tabMatches[tabIndex];
+            return;
+        }
+
+        // Find new matches
+        tabMatches = completions.filter(cmd =>
+            cmd.toLowerCase().startsWith(current)
+        );
+        tabIndex = 0;
+
+        if (tabMatches.length === 1) {
+            input.value = tabMatches[0];
+        } else if (tabMatches.length > 1) {
+            input.value = tabMatches[0];
+            showOutput(tabMatches.join('  '), 'help');
+        }
+    }
+
+    function resetTabState() {
+        tabMatches = [];
+        tabIndex = 0;
     }
 
     function executeCommand(cmd) {
@@ -118,6 +222,16 @@
                 break;
             case 'help':
                 showOutput(helpText, 'help');
+                break;
+            case 'easter':
+                const eggKey = command.key;
+                let msg;
+                if (eggKey === 'fortune') {
+                    msg = fortunes[Math.floor(Math.random() * fortunes.length)];
+                } else {
+                    msg = easterEggs[eggKey];
+                }
+                showOutput(msg, 'help');
                 break;
         }
     }
