@@ -1,16 +1,13 @@
 :root {
-    --bg: #0a0a0a;
-    --bg-secondary: #111111;
-    --text: #b0b0b0;
-    --text-dim: #505050;
-    --green: #00ff00;
-    --green-dim: #00aa00;
-    --blue: #00aaff;
-    --purple: #aa00ff;
-    --yellow: #ffaa00;
-    --cyan: #00ffff;
-    --red: #ff3333;
-    --border: #222222;
+    --bg: #0d1117;
+    --text: #c9d1d9;
+    --text-dim: #6e7681;
+    --green: #3fb950;
+    --blue: #58a6ff;
+    --purple: #bc8cff;
+    --yellow: #d29922;
+    --cyan: #39c5cf;
+    --border: #30363d;
 }
 
 * {
@@ -31,6 +28,19 @@ body {
     font-size: 14px;
 }
 
+::selection {
+    background: var(--green);
+    color: var(--bg);
+}
+
+a {
+    color: var(--blue);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
 
 /* Terminal Window */
 .terminal {
@@ -42,22 +52,33 @@ body {
 .terminal-header {
     position: sticky;
     top: 0;
-    background: var(--bg);
-    padding: 0.6rem 1.5rem;
+    background: #161b22;
+    padding: 0.75rem 1.5rem;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 0.5rem;
     border-bottom: 1px solid var(--border);
     z-index: 100;
 }
 
+.terminal-btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.terminal-btn.red { background: #f85149; }
+.terminal-btn.yellow { background: #d29922; }
+.terminal-btn.green { background: #3fb950; }
+
 .terminal-title {
-    color: var(--green);
+    margin-left: 1rem;
+    color: var(--text-dim);
     font-size: 0.8rem;
-    text-shadow: 0 0 5px var(--green-dim);
 }
 
 .terminal-nav {
+    margin-left: auto;
     display: flex;
     gap: 1.5rem;
 }
@@ -79,7 +100,6 @@ body {
 /* Prompt */
 .prompt {
     color: var(--green);
-    text-shadow: 0 0 5px var(--green-dim);
 }
 
 .command {
@@ -88,12 +108,10 @@ body {
 
 .flag {
     color: var(--yellow);
-    text-shadow: 0 0 3px rgba(255, 170, 0, 0.3);
 }
 
 .string {
     color: var(--cyan);
-    text-shadow: 0 0 3px rgba(0, 255, 255, 0.3);
 }
 
 .comment {
@@ -117,18 +135,17 @@ body {
 /* Cursor */
 .cursor {
     display: inline-block;
-    width: 10px;
-    height: 18px;
+    width: 8px;
+    height: 16px;
     background: var(--green);
-    box-shadow: 0 0 10px var(--green), 0 0 20px var(--green-dim);
-    animation: blink 0.8s infinite;
+    animation: blink 1s infinite;
     vertical-align: middle;
     margin-left: 2px;
 }
 
 @keyframes blink {
-    0%, 49% { opacity: 1; }
-    50%, 100% { opacity: 0; }
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
 }
 
 /* Tree View */
@@ -434,64 +451,6 @@ body {
     margin-top: 2rem;
 }
 
-/* Scanlines Effect */
-.terminal::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.15),
-        rgba(0, 0, 0, 0.15) 1px,
-        transparent 1px,
-        transparent 2px
-    );
-    pointer-events: none;
-    z-index: 1000;
-}
-
-/* CRT flicker effect */
-.terminal::after {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 255, 0, 0.02);
-    pointer-events: none;
-    z-index: 999;
-    animation: flicker 0.15s infinite;
-}
-
-@keyframes flicker {
-    0% { opacity: 0.97; }
-    50% { opacity: 1; }
-    100% { opacity: 0.98; }
-}
-
-/* Glow effects for links */
-a {
-    color: var(--blue);
-    text-decoration: none;
-    text-shadow: 0 0 3px rgba(0, 170, 255, 0.3);
-}
-
-a:hover {
-    text-decoration: none;
-    text-shadow: 0 0 8px var(--blue);
-}
-
-/* Selection color */
-::selection {
-    background: var(--green);
-    color: var(--bg);
-    text-shadow: none;
-}
-
 /* Responsive */
 @media (max-width: 600px) {
     .terminal-body {
@@ -504,15 +463,5 @@ a:hover {
 
     .exp-header {
         flex-direction: column;
-    }
-
-    .terminal::before {
-        background: repeating-linear-gradient(
-            0deg,
-            rgba(0, 0, 0, 0.1),
-            rgba(0, 0, 0, 0.1) 1px,
-            transparent 1px,
-            transparent 3px
-        );
     }
 }
