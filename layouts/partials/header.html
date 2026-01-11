@@ -1,17 +1,12 @@
 <div class="terminal-header">
-    <div class="terminal-controls">
-        <span class="control-btn">[<span class="ctrl-char">_</span>]</span>
-        <span class="control-btn">[<span class="ctrl-char">□</span>]</span>
-        <span class="control-btn close-btn">[<span class="ctrl-char">×</span>]</span>
-    </div>
-    <span class="terminal-title">{{ if .IsHome }}mikhail@wall:~{{ else }}{{ .Title }}{{ end }}</span>
+    <span class="terminal-title">{{ if .IsHome }}mikhail@wall:~{{ else }}~/{{ .Section }}/{{ .File.BaseFileName }}{{ end }}</span>
     <nav class="terminal-nav">
         {{ if .IsHome }}
             {{ range .Site.Menus.main }}
             <a href="{{ .URL }}">{{ .Name }}</a>
             {{ end }}
         {{ else }}
-            <a href="/">← cd ~</a>
+            <a href="/">cd ~</a>
         {{ end }}
     </nav>
 </div>
