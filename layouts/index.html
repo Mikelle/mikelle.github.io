@@ -2,7 +2,7 @@
 <!-- Hero -->
 <section class="section">
     <div class="cmd-line">
-        <span class="prompt">root@wall:~#</span> <span class="command">whoami</span>
+        <span class="prompt">$</span> <span class="command">whoami</span>
     </div>
     <div class="output">
         <div style="margin-bottom: 1rem;">
@@ -16,7 +16,7 @@
 <!-- About -->
 <section id="about" class="section">
     <div class="cmd-line">
-        <span class="prompt">root@wall:~#</span> <span class="command">cat</span> <span class="string">README.md</span>
+        <span class="prompt">$</span> <span class="command">cat</span> <span class="string">README.md</span>
     </div>
     <div class="output">
         <p style="margin-bottom: 0.5rem;">Currently at <a href="https://infrared.finance">Infrared Finance</a> building DeFi infrastructure.</p>
@@ -24,7 +24,7 @@
     </div>
 
     <div class="cmd-line">
-        <span class="prompt">root@wall:~#</span> <span class="command">ls</span> <span class="string">skills/</span>
+        <span class="prompt">$</span> <span class="command">ls</span> <span class="string">skills/</span>
     </div>
     <div class="output">
         <div class="tree">
@@ -39,7 +39,7 @@
 <!-- Experience -->
 <section id="experience" class="section">
     <div class="cmd-line">
-        <span class="prompt">root@wall:~#</span> <span class="command">git log</span> <span class="flag">--oneline</span> <span class="string">career</span>
+        <span class="prompt">$</span> <span class="command">git log</span> <span class="flag">--oneline</span> <span class="string">career</span>
     </div>
     <div class="output">
         <div class="exp-item">
@@ -125,7 +125,7 @@
 <!-- Projects -->
 <section id="projects" class="section">
     <div class="cmd-line">
-        <span class="prompt">root@wall:~#</span> <span class="command">find</span> <span class="string">~/projects</span> <span class="flag">-type d</span>
+        <span class="prompt">$</span> <span class="command">find</span> <span class="string">~/projects</span> <span class="flag">-type d</span>
     </div>
     <div class="output">
         <div class="project">
@@ -145,7 +145,7 @@
 <!-- Blog -->
 <section class="section">
     <div class="cmd-line">
-        <span class="prompt">root@wall:~#</span> <span class="command">ls</span> <span class="string">blog/</span>
+        <span class="prompt">$</span> <span class="command">ls</span> <span class="string">blog/</span>
     </div>
     <div class="output">
         {{ range first 3 (where .Site.RegularPages "Section" "blog") }}
@@ -168,7 +168,7 @@
 <!-- Notes preview -->
 <section class="section">
     <div class="cmd-line">
-        <span class="prompt">root@wall:~#</span> <span class="command">tail</span> <span class="flag">-n 3</span> <span class="string">notes.log</span>
+        <span class="prompt">$</span> <span class="command">tail</span> <span class="flag">-n 3</span> <span class="string">notes.log</span>
     </div>
     <div class="output">
         {{ range first 3 (where .Site.RegularPages "Section" "notes") }}
@@ -191,7 +191,7 @@
 <!-- Contact -->
 <section id="contact" class="section">
     <div class="cmd-line">
-        <span class="prompt">root@wall:~#</span> <span class="command">cat</span> <span class="string">.contact</span>
+        <span class="prompt">$</span> <span class="command">cat</span> <span class="string">.contact</span>
     </div>
     <div class="output">
         <div class="contact-row">
@@ -209,7 +209,7 @@
     </div>
 
     <div class="cmd-line" style="margin-top: 2rem;">
-        <span class="prompt">root@wall:~#</span> <span class="cursor"></span>
+        <span class="prompt">$</span> <span class="cursor"></span>
     </div>
 </section>
 {{ end }}
