@@ -1,0 +1,47 @@
+baseURL = "https://yourusername.github.io/"
+languageCode = "en-us"
+title = "Mikhail Wall"
+
+[params]
+  description = "Protocol Engineer. L2 infrastructure, MEV, DeFi."
+  author = "Mikhail Wall"
+  email = "mikhwall@gmail.com"
+  github = "Mikelle"
+  linkedin = "mikhwall"
+  location = "Belgrade, Serbia"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = true
+    lineNos = false
+    style = "github-dark"
+
+[menu]
+  [[menu.main]]
+    name = "about"
+    url = "#about"
+    weight = 1
+  [[menu.main]]
+    name = "exp"
+    url = "#experience"
+    weight = 2
+  [[menu.main]]
+    name = "projects"
+    url = "#projects"
+    weight = 3
+  [[menu.main]]
+    name = "blog"
+    url = "/blog/"
+    weight = 4
+  [[menu.main]]
+    name = "notes"
+    url = "/notes/"
+    weight = 5
+  [[menu.main]]
+    name = "contact"
+    url = "#contact"
+    weight = 6

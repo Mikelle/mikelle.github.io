@@ -1,0 +1,20 @@
+{{ define "main" }}
+<div class="cmd-line">
+    <span class="prompt">~$</span> <span class="command">ls</span> <span class="flag">-la</span> <span class="string">blog/</span>
+</div>
+
+{{ range .Pages }}
+<div class="article-item">
+    <div class="article-status">[{{ if .Draft }}draft{{ else }}{{ .Date.Format "2006.01" }}{{ end }}]</div>
+    <div class="article-title"><a href="{{ .Permalink }}">{{ .Title }}</a></div>
+    {{ with .Description }}<div class="article-desc">{{ . }}</div>{{ end }}
+    {{ with .Params.tags }}
+    <div class="article-tags">
+        {{ range . }}<span class="article-tag">{{ . }}</span>{{ end }}
+    </div>
+    {{ end }}
+</div>
+{{ else }}
+<p style="color: var(--text-dim); margin-top: 1rem;">No articles yet.</p>
+{{ end }}
+{{ end }}

@@ -1,0 +1,22 @@
+{{ define "main" }}
+<div class="cmd-line">
+    <span class="prompt">~$</span> <span class="command">cat</span> <span class="string">notes.log</span>
+</div>
+
+{{ range .Pages }}
+<div class="log-entry">
+    <div class="log-date">// {{ .Date.Format "2006.01" }}</div>
+    <div class="log-title"><a href="{{ .Permalink }}" style="color: var(--text);">{{ .Title }}</a></div>
+    <div class="log-content">
+        {{ .Summary }}
+    </div>
+    {{ with .Params.tags }}
+    <div class="log-tags">
+        {{ range . }}<span class="log-tag">{{ . }}</span>{{ end }}
+    </div>
+    {{ end }}
+</div>
+{{ else }}
+<p style="color: var(--text-dim); margin-top: 1rem;">No notes yet.</p>
+{{ end }}
+{{ end }}

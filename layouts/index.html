@@ -1,0 +1,215 @@
+{{ define "main" }}
+<!-- Hero -->
+<section class="section">
+    <div class="cmd-line">
+        <span class="prompt">~$</span> <span class="command">whoami</span>
+    </div>
+    <div class="output">
+        <div style="margin-bottom: 1rem;">
+            <strong style="color: var(--text); font-size: 1.1rem;">Mikhail Wall</strong>
+        </div>
+        <div>Protocol Engineer. L2 infrastructure, MEV, DeFi.</div>
+        <div style="color: var(--text-dim); margin-top: 0.5rem;">{{ .Site.Params.location }}</div>
+    </div>
+</section>
+
+<!-- About -->
+<section id="about" class="section">
+    <div class="cmd-line">
+        <span class="prompt">~$</span> <span class="command">cat</span> <span class="string">README.md</span>
+    </div>
+    <div class="output">
+        <p style="margin-bottom: 0.5rem;">Currently at <a href="https://infrared.finance">Infrared Finance</a> building DeFi infrastructure.</p>
+        <p>Previously: core contributor to <a href="https://polygon.technology/polygon-zkevm">Polygon zkEVM</a>, P2P networks at <a href="https://primev.xyz">Primev</a> (a16z), algorithmic trading at <a href="https://anboto.xyz">Anboto Labs</a>.</p>
+    </div>
+
+    <div class="cmd-line">
+        <span class="prompt">~$</span> <span class="command">ls</span> <span class="string">skills/</span>
+    </div>
+    <div class="output">
+        <div class="tree">
+            <div class="tree-item"><span class="tree-branch">├──</span> <span class="tree-dir">languages/</span> <span class="tree-file">Golang, Solidity, TypeScript, Python, Rust</span></div>
+            <div class="tree-item"><span class="tree-branch">├──</span> <span class="tree-dir">blockchain/</span> <span class="tree-file">Geth/EVM, Foundry, libp2p, cometBFT</span></div>
+            <div class="tree-item"><span class="tree-branch">├──</span> <span class="tree-dir">infra/</span> <span class="tree-file">PostgreSQL, Redis, Docker/k8s, Terraform</span></div>
+            <div class="tree-item"><span class="tree-branch">└──</span> <span class="tree-dir">domains/</span> <span class="tree-file">L2/zkEVM, MEV/PBS, DeFi, P2P, Cryptography</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- Experience -->
+<section id="experience" class="section">
+    <div class="cmd-line">
+        <span class="prompt">~$</span> <span class="command">git log</span> <span class="flag">--oneline</span> <span class="string">career</span>
+    </div>
+    <div class="output">
+        <div class="exp-item">
+            <div class="exp-header">
+                <span><span class="exp-role">Senior Backend Engineer</span> @ <span class="exp-company">Infrared Finance</span> <span class="comment">(Binance Labs, Framework)</span></span>
+                <span class="exp-date">2025 → now</span>
+            </div>
+            <div class="exp-desc">Uniswap V3 optimizer, Safe multi-sig client, price aggregation</div>
+            <div class="exp-tech">
+                <span class="tag">Golang</span>
+                <span class="tag">Python</span>
+                <span class="tag">PostgreSQL</span>
+            </div>
+        </div>
+
+        <div class="exp-item">
+            <div class="exp-header">
+                <span><span class="exp-role">Protocol Engineer</span> @ <a href="https://github.com/primev/mev-commit" class="exp-company">Primev</a> <span class="comment">(a16z)</span></span>
+                <span class="exp-date">2024 → 2025</span>
+            </div>
+            <div class="exp-desc">mev-commit P2P network, encrypted bidding, ZK proofs</div>
+            <div class="exp-tech">
+                <span class="tag">Golang</span>
+                <span class="tag">Solidity</span>
+                <span class="tag">libp2p</span>
+            </div>
+        </div>
+
+        <div class="exp-item">
+            <div class="exp-header">
+                <span><span class="exp-role">Lead Blockchain Engineer</span> @ <span class="exp-company">Anboto Labs</span> <span class="comment">(Mechanism Capital, Kronos)</span></span>
+                <span class="exp-date">2023 → 2024</span>
+            </div>
+            <div class="exp-desc">Cross-chain DeFi execution, smart order routing</div>
+            <div class="exp-tech">
+                <span class="tag">Python</span>
+                <span class="tag">TypeScript</span>
+                <span class="tag">Solidity</span>
+            </div>
+        </div>
+
+        <div class="exp-item">
+            <div class="exp-header">
+                <span><span class="exp-role">Blockchain Engineer</span> @ <a href="https://github.com/0xPolygonHermez/zkevm-node" class="exp-company">Polygon Labs</a> <span class="comment">(Sequoia, SoftBank)</span></span>
+                <span class="exp-date">2021 → 2022</span>
+            </div>
+            <div class="exp-desc">zkEVM core: sequencer, aggregator, tx pool</div>
+            <div class="exp-tech">
+                <span class="tag">Golang</span>
+                <span class="tag">PostgreSQL</span>
+                <span class="tag">Geth</span>
+            </div>
+        </div>
+
+        <div class="exp-item">
+            <div class="exp-header">
+                <span><span class="exp-role">Team Lead</span> @ <span class="exp-company">Russian Railways</span> <span class="comment">(Russia's biggest company)</span></span>
+                <span class="exp-date">2018 → 2020</span>
+            </div>
+            <div class="exp-desc">7-person team, supply chain blockchain pilots</div>
+            <div class="exp-tech">
+                <span class="tag">Golang</span>
+                <span class="tag">Hyperledger</span>
+                <span class="tag">Redis</span>
+            </div>
+        </div>
+
+        <div class="exp-item">
+            <div class="exp-header">
+                <span><span class="exp-role">Software Engineer</span> @ <span class="exp-company">DSX Technologies</span></span>
+                <span class="exp-date">2016 → 2018</span>
+            </div>
+            <div class="exp-desc">Exchange backend, e-voting system</div>
+            <div class="exp-tech">
+                <span class="tag">Java</span>
+                <span class="tag">Golang</span>
+                <span class="tag">Solidity</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Projects -->
+<section id="projects" class="section">
+    <div class="cmd-line">
+        <span class="prompt">~$</span> <span class="command">find</span> <span class="string">~/projects</span> <span class="flag">-type d</span>
+    </div>
+    <div class="output">
+        <div class="project">
+            <div><span class="project-name">mev-commit</span></div>
+            <div class="project-desc">P2P pre-confirmations, encrypted bidding, ZK proofs</div>
+            <a href="https://github.com/primev/mev-commit">github.com/primev/mev-commit</a>
+        </div>
+
+        <div class="project">
+            <div><span class="project-name">zkevm-node</span></div>
+            <div class="project-desc">Polygon zkEVM sequencer, aggregator, transaction pool</div>
+            <a href="https://github.com/0xPolygonHermez/zkevm-node">github.com/0xPolygonHermez/zkevm-node</a>
+        </div>
+    </div>
+</section>
+
+<!-- Blog -->
+<section class="section">
+    <div class="cmd-line">
+        <span class="prompt">~$</span> <span class="command">ls</span> <span class="string">blog/</span>
+    </div>
+    <div class="output">
+        {{ range first 3 (where .Site.RegularPages "Section" "blog") }}
+        <div class="blog-item">
+            <span class="blog-status">[{{ if .Draft }}draft{{ else }}{{ .Date.Format "01.06" }}{{ end }}]</span>
+            <span class="blog-title"><a href="{{ .Permalink }}">{{ .Title }}</a></span>
+        </div>
+        {{ else }}
+        <div class="blog-item">
+            <span class="blog-status">[draft]</span>
+            <span class="blog-title">Coming soon...</span>
+        </div>
+        {{ end }}
+        <div style="margin-top: 1rem;">
+            <a href="/blog/">more →</a>
+        </div>
+    </div>
+</section>
+
+<!-- Notes preview -->
+<section class="section">
+    <div class="cmd-line">
+        <span class="prompt">~$</span> <span class="command">tail</span> <span class="flag">-n 3</span> <span class="string">notes.log</span>
+    </div>
+    <div class="output">
+        {{ range first 3 (where .Site.RegularPages "Section" "notes") }}
+        <div class="blog-item">
+            <span class="blog-status">[{{ .Date.Format "01.06" }}]</span>
+            <span class="blog-title"><a href="{{ .Permalink }}">{{ .Title }}</a></span>
+        </div>
+        {{ else }}
+        <div class="blog-item">
+            <span class="blog-status">[01.25]</span>
+            <span class="blog-title">Coming soon...</span>
+        </div>
+        {{ end }}
+        <div style="margin-top: 1rem;">
+            <a href="/notes/">more →</a>
+        </div>
+    </div>
+</section>
+
+<!-- Contact -->
+<section id="contact" class="section">
+    <div class="cmd-line">
+        <span class="prompt">~$</span> <span class="command">cat</span> <span class="string">.contact</span>
+    </div>
+    <div class="output">
+        <div class="contact-row">
+            <span class="contact-label">email</span>
+            <a href="mailto:{{ .Site.Params.email }}">{{ .Site.Params.email }}</a>
+        </div>
+        <div class="contact-row">
+            <span class="contact-label">github</span>
+            <a href="https://github.com/{{ .Site.Params.github }}">github.com/{{ .Site.Params.github }}</a>
+        </div>
+        <div class="contact-row">
+            <span class="contact-label">linkedin</span>
+            <a href="https://linkedin.com/in/{{ .Site.Params.linkedin }}">linkedin.com/in/{{ .Site.Params.linkedin }}</a>
+        </div>
+    </div>
+
+    <div class="cmd-line" style="margin-top: 2rem;">
+        <span class="prompt">~$</span> <span class="cursor"></span>
+    </div>
+</section>
+{{ end }}

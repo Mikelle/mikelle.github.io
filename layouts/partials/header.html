@@ -1,0 +1,15 @@
+<div class="terminal-header">
+    <div class="terminal-btn red"></div>
+    <div class="terminal-btn yellow"></div>
+    <div class="terminal-btn green"></div>
+    <span class="terminal-title">{{ if .IsHome }}mikhail@wall:~{{ else }}{{ .Title }}{{ end }}</span>
+    <nav class="terminal-nav">
+        {{ if .IsHome }}
+            {{ range .Site.Menus.main }}
+            <a href="{{ .URL }}">{{ .Name }}</a>
+            {{ end }}
+        {{ else }}
+            <a href="/">← back</a>
+        {{ end }}
+    </nav>
+</div>
