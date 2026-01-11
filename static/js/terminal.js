@@ -40,6 +40,7 @@
         'ping': { action: 'easter', key: 'ping' },
         'hello': { action: 'easter', key: 'hello' },
         'hi': { action: 'easter', key: 'hello' },
+        'ls': { action: 'easter', key: 'ls' },
         'ls -la': { action: 'easter', key: 'lsla' },
         'pwd': { action: 'easter', key: 'pwd' },
         'fortune': { action: 'easter', key: 'fortune' },
@@ -59,6 +60,7 @@
         'coffee': '☕ brewing caffeine.exe...\n[==========>         ] 50%\njust kidding, go touch grass.',
         'ping': 'pong',
         'hello': 'hey there 👋',
+        'ls': 'README.md  skills/  blog/  notes/  .contact\n\ntry: ls skills/, ls blog/, cat README.md',
         'lsla': 'drwxr-xr-x  mikhail mass_code\n-rw-r--r--  mikhail mass_bugs\n-rw-r--r--  mikhail mass_coffee',
         'pwd': '/home/mikhail/trying-to-look-cool',
         'fortune': null, // handled specially
