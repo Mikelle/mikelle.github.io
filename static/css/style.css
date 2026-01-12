@@ -685,11 +685,27 @@ a:hover {
 
 /* Responsive */
 @media (max-width: 600px) {
+    .terminal-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .terminal-title {
+        flex: 1;
+    }
+
+    .theme-toggle {
+        margin-left: auto;
+    }
+
     .terminal-body {
         padding: 1.5rem 1rem;
     }
 
     .terminal-nav {
+        display: none;
+    }
+
+    .terminal-nav::after {
         display: none;
     }
 
