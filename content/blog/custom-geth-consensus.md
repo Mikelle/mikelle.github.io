@@ -71,7 +71,13 @@ go run main.go
 
 ## JWT Authentication
 
-Geth's Engine API requires JWT auth. A 32-byte shared secret is included in the repo at [`jwt/jwt.hex`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/jwt/jwt.hex). Wrap HTTP requests with a JWT token:
+Geth's Engine API requires JWT auth. A 32-byte shared secret is included in the repo at [`jwt/jwt.hex`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/jwt/jwt.hex). To generate your own:
+
+```bash
+openssl rand -hex 32 > jwt/jwt.hex
+```
+
+Wrap HTTP requests with a JWT token:
 
 ```go
 // jwt.go
