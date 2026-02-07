@@ -50,9 +50,11 @@ The Engine API uses HTTP with JWT authentication. Three primary methods:
 
 ## Running Geth
 
-Start Geth with docker compose:
+Clone the repo and start Geth:
 
 ```bash
+git clone https://github.com/mikelle/geth-consensus-tutorial.git
+cd geth-consensus-tutorial
 docker compose up geth
 ```
 
