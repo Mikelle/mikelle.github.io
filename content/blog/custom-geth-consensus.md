@@ -331,7 +331,7 @@ State machine:
 
 ## What's Next
 
-**Part 2: Single Node Consensus** builds a complete implementation with full application structure, retry logic, metrics, and configuration management.
+**[Part 2: Single Node Consensus](/blog/single-node-consensus)** builds a complete implementation with full application structure, retry logic, metrics, and configuration management.
 
 ---
 
