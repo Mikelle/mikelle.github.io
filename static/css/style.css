@@ -614,6 +614,19 @@ a:hover {
     padding: 0;
 }
 
+.article-body table {
+    border-collapse: collapse;
+    margin: 1rem 0;
+    width: 100%;
+}
+
+.article-body th,
+.article-body td {
+    padding: 0.5rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
 .article-body ul, .article-body ol {
     margin: 1rem 0;
     padding-left: 1.5rem;
