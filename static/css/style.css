@@ -577,6 +577,9 @@ a:hover {
     border-radius: 6px;
     overflow-x: auto;
     margin: 1rem 0;
+}
+
+.article-body .highlight {
     position: relative;
 }
 
@@ -584,7 +587,7 @@ a:hover {
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;
-    background: var(--bg);
+    background: rgba(13, 17, 23, 0.8);
     border: 1px solid var(--border);
     color: var(--text-dim);
     padding: 0.25rem 0.5rem;
@@ -594,9 +597,10 @@ a:hover {
     font-size: 0.75rem;
     opacity: 0;
     transition: opacity 0.2s;
+    z-index: 1;
 }
 
-.article-body pre:hover .copy-btn {
+.article-body .highlight:hover .copy-btn {
     opacity: 1;
 }
 
