@@ -70,7 +70,25 @@ func NewClient(addr, password, streamName string) (*Client, error) {
 }
 ```
 
-The client also exposes `Set`, `Get`, `SetNX`, `Del` for state management, plus `PublishBlock` for the Redis stream and two Lua-script-backed atomic operations for leader election: `RenewIfValue` (renew a lease only if we still hold it) and `DelIfValue` (release a lock only if it's ours) — see the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/03-member-nodes/pkg/redis/client.go).
+The client also exposes `Set`, `Get`, `SetNX`, `Del` for state management, plus `PublishBlock` for the Redis stream. For leader election, we need two atomic operations that check-and-act in a single Redis round-trip. Lua scripts run atomically on the Redis server:
+
+```go
+func (c *Client) RenewIfValue(ctx context.Context, key, value string, expiration time.Duration) (bool, error) {
+    script := redis.NewScript(`
+if redis.call("get", KEYS[1]) == ARGV[1] then
+    redis.call("set", KEYS[1], ARGV[1], "PX", ARGV[2])
+    return 1
+end
+return 0`)
+    result, err := script.Run(ctx, c.rdb, []string{key}, value, expiration.Milliseconds()).Int64()
+    if err != nil {
+        return false, err
+    }
+    return result == 1, nil
+}
+```
+
+`DelIfValue` follows the same pattern — only delete if the key still holds our value. See the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/03-member-nodes/pkg/redis/client.go).
 
 ## Leader Election
 
@@ -95,7 +113,7 @@ type LeaderElection struct {
 }
 ```
 
-Every 2 seconds, the election loop attempts to acquire or renew the lock:
+Every 2 seconds, the election loop attempts to acquire or renew the lock. The renewal must be atomic — if we did a separate `Get` then `Set`, the key could expire between the two calls and another node could acquire it, leading to two nodes both believing they're leader. `RenewIfValue` uses a Lua script to check the value and renew the TTL in a single Redis operation:
 
 ```go
 func (le *LeaderElection) tryAcquireOrRenew(ctx context.Context) {
@@ -137,7 +155,7 @@ func (le *LeaderElection) tryAcquireOrRenew(ctx context.Context) {
 }
 ```
 
-On graceful shutdown, we conditionally delete the key — only if it still holds our instance ID — so failover is instant rather than waiting for the 5-second TTL:
+On graceful shutdown, we can't just `Del` the key — between checking `wasLeader` and calling `Del`, another node may have already acquired the lock, and we'd delete *their* lease. `DelIfValue` uses a Lua script to only delete the key if it still holds our instance ID:
 
 ```go
 func (le *LeaderElection) Stop() {
