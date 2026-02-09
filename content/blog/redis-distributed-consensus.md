@@ -2,13 +2,13 @@
 title: "Distributed Consensus with Redis, PostgreSQL, and Member Nodes"
 date: 2026-01-17
 draft: true
-description: "Adding fault tolerance with Redis leader election, PostgreSQL payload storage, and horizontally scalable member nodes."
+description: "Adding fault tolerance with Redis leader election, PostgreSQL payload storage, and member nodes that execute blocks on their own Geth."
 tags: ["consensus", "geth", "mev", "redis", "postgres", "tutorial"]
 ---
 
 *Part 3 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
 
-In [Part 2](/blog/single-node-consensus), we built a production-ready single-node consensus layer. But a single node is a single point of failure. This article adds Redis-based leader election for failover, PostgreSQL for durable payload storage, and member nodes that sync blocks from the leader via HTTP. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/03-member-nodes).
+In [Part 2](/blog/single-node-consensus), we built a production-ready single-node consensus layer. But a single node is a single point of failure. This article adds Redis-based leader election for failover, PostgreSQL for durable payload storage, and member nodes that sync blocks from the leader and execute them on their own Geth instance — making each member a full execution replica. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/03-member-nodes).
 
 ## What We're Building
 
@@ -27,15 +27,18 @@ In [Part 2](/blog/single-node-consensus), we built a production-ready single-nod
 │  └──────────────┘                              │            │
 └────────────────────────────────────────────────┼────────────┘
                                                  │
-                          ┌──────────────────────┼──────────────────┐
-                          │                      │                  │
-                   ┌──────▼──────┐        ┌──────▼──────┐   ┌──────▼──────┐
-                   │  Member 1   │        │  Member 2   │   │  Member 3   │
-                   │  (syncer)   │        │  (syncer)   │   │  (syncer)   │
-                   └─────────────┘        └─────────────┘   └─────────────┘
+                   ┌─────────────────────────────┼──────────────────────┐
+                   │                             │                      │
+            ┌──────▼──────┐               ┌──────▼──────┐       ┌──────▼──────┐
+            │  Member 1   │               │  Member 2   │       │  Member 3   │
+            │ Syncer+Geth │               │ Syncer+Geth │       │ Syncer+Geth │
+            │ +PostgreSQL │               │ +PostgreSQL │       │ +PostgreSQL │
+            └─────────────┘               └─────────────┘       └─────────────┘
 ```
 
-The **leader** builds blocks on Geth, stores payloads in PostgreSQL, and exposes an HTTP API. **Member nodes** poll that API to sync block data into their own PostgreSQL — they're read replicas that can serve queries without touching the leader.
+The **leader** builds blocks on Geth, stores payloads in PostgreSQL, and exposes an HTTP API. **Member nodes** poll that API, execute each block on their own Geth via the Engine API, and store the results in their local PostgreSQL — making each member a full execution replica that can serve RPC queries (eth_call, eth_getBalance, etc.) without touching the leader.
+
+Since NewPayloadV4 requires both the execution payload and [EIP-7685](https://eips.ethereum.org/EIPS/eip-7685) execution requests to execute a block, we store both in PostgreSQL so members can replay them.
 
 Redis handles two things: leader election (so a standby can take over if the leader dies) and block build state (so the leader can recover mid-build after a restart).
 
@@ -161,7 +164,7 @@ Same `StateManager` interface from Part 2 — the implementation changes from in
 
 ```go
 type RedisStateManager struct {
-    client     *redis.Client
+    client     *Client
     instanceID string
     mu         sync.RWMutex
     localState *BlockBuildState // Local cache fallback
@@ -199,17 +202,22 @@ func (s *PayloadStore) migrate(ctx context.Context) error {
             block_hash TEXT NOT NULL UNIQUE,
             parent_hash TEXT NOT NULL,
             payload_data TEXT NOT NULL,
+            requests_data TEXT NOT NULL DEFAULT '',
             timestamp BIGINT NOT NULL,
             created_at TIMESTAMPTZ DEFAULT NOW()
         );
 
         CREATE INDEX IF NOT EXISTS idx_payloads_block_hash ON payloads(block_hash);
         CREATE INDEX IF NOT EXISTS idx_payloads_timestamp ON payloads(timestamp);
+
+        ALTER TABLE payloads ADD COLUMN IF NOT EXISTS requests_data TEXT NOT NULL DEFAULT '';
     `
     _, err := s.pool.Exec(ctx, query)
     return err
 }
 ```
+
+The `requests_data` column stores the base64-encoded execution requests alongside each payload. The `ALTER TABLE` handles upgrades from the previous schema.
 
 The store uses [`pgx`](https://github.com/jackc/pgx) with connection pooling and provides `SavePayload`, `GetPayloadByNumber`, `GetPayloadByHash`, `GetLatestPayload`, and `GetPayloadsAfter` — see the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/03-member-nodes/pkg/postgres/store.go).
 
@@ -218,7 +226,7 @@ The key query for member sync is batch fetching by block number:
 ```go
 func (s *PayloadStore) GetPayloadsAfter(ctx context.Context, afterNumber uint64, limit int) ([]*Payload, error) {
     query := `
-        SELECT block_number, block_hash, parent_hash, payload_data, timestamp
+        SELECT block_number, block_hash, parent_hash, payload_data, requests_data, timestamp
         FROM payloads
         WHERE block_number > $1
         ORDER BY block_number ASC
@@ -237,11 +245,12 @@ The block builder is the same as Part 2, with two additions after finalization �
 // Store in PostgreSQL
 if bb.payloadStore != nil {
     pgPayload := &postgres.Payload{
-        BlockNumber: payload.Number,
-        BlockHash:   payload.BlockHash.Hex(),
-        ParentHash:  payload.ParentHash.Hex(),
-        PayloadData: executionPayloadStr,
-        Timestamp:   int64(payload.Timestamp),
+        BlockNumber:  payload.Number,
+        BlockHash:    payload.BlockHash.Hex(),
+        ParentHash:   payload.ParentHash.Hex(),
+        PayloadData:  executionPayloadStr,
+        RequestsData: requestsStr,
+        Timestamp:    int64(payload.Timestamp),
     }
     if err := bb.payloadStore.SavePayload(ctx, pgPayload); err != nil {
         bb.logger.Warn("Failed to store payload in PostgreSQL", "error", err)
@@ -296,54 +305,67 @@ func (s *Server) handleGetBlocksAfter(w http.ResponseWriter, r *http.Request) {
 
 ## Member Syncer
 
-Member nodes poll the leader's HTTP API every 100ms for new blocks. When blocks arrive, they're stored in the member's own PostgreSQL:
+Member nodes poll the leader's HTTP API every 100ms for new blocks. For each block, the syncer executes it on the local Geth via the Engine API, then stores it in PostgreSQL. The syncer defines its own `ExecutionEngine` interface to avoid importing the block builder:
 
 ```go
-type Syncer struct {
-    leaderURL   string
-    store       *postgres.PayloadStore
-    logger      *slog.Logger
-    httpClient  *http.Client
-    lastSynced  atomic.Uint64
-    syncedCount atomic.Uint64
-}
-
-func (s *Syncer) syncBatch(ctx context.Context) error {
-    lastSynced := s.lastSynced.Load()
-
-    url := fmt.Sprintf("%s/blocks?after=%d&limit=100", s.leaderURL, lastSynced)
-    req, _ := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-    resp, err := s.httpClient.Do(req)
-    if err != nil {
-        return err
-    }
-    defer resp.Body.Close()
-
-    var blocksResp BlocksResponse
-    json.NewDecoder(resp.Body).Decode(&blocksResp)
-
-    for _, block := range blocksResp.Blocks {
-        payload := &postgres.Payload{
-            BlockNumber: block.BlockNumber,
-            BlockHash:   block.BlockHash,
-            ParentHash:  block.ParentHash,
-            PayloadData: block.PayloadData,
-            Timestamp:   block.Timestamp,
-        }
-
-        if err := s.store.SavePayload(ctx, payload); err != nil {
-            return fmt.Errorf("save payload %d: %w", block.BlockNumber, err)
-        }
-
-        s.lastSynced.Store(block.BlockNumber)
-        s.syncedCount.Add(1)
-    }
-
-    return nil
+type ExecutionEngine interface {
+    NewPayloadV4(ctx context.Context, payload engine.ExecutableData,
+        versionedHashes []common.Hash, beaconRoot *common.Hash,
+        requests [][]byte) (engine.PayloadStatusV1, error)
+    ForkchoiceUpdatedV3(ctx context.Context, state engine.ForkchoiceStateV1,
+        attrs *engine.PayloadAttributes) (engine.ForkChoiceResponse, error)
+    HeaderByNumber(ctx context.Context, number interface{}) (*types.Header, error)
 }
 ```
 
-On startup, the syncer checks its local PostgreSQL for the highest block and resumes from there — so restarts don't re-sync the entire chain.
+For each fetched block, `executeBlock` deserializes the payload and requests, then replays the same Engine API calls the leader made — `NewPayloadV4` to push the block, `ForkchoiceUpdatedV3` to set the head:
+
+```go
+func (s *Syncer) executeBlock(ctx context.Context, block *BlockResponse) error {
+    // Decode base64 → msgpack → ExecutableData
+    payloadBytes, err := base64.StdEncoding.DecodeString(block.PayloadData)
+    if err != nil {
+        return fmt.Errorf("decode payload: %w", err)
+    }
+    var execPayload engine.ExecutableData
+    if err := msgpack.Unmarshal(payloadBytes, &execPayload); err != nil {
+        return fmt.Errorf("unmarshal payload: %w", err)
+    }
+
+    // Decode requests
+    var requests [][]byte
+    if block.RequestsData != "" {
+        requestsBytes, err := base64.StdEncoding.DecodeString(block.RequestsData)
+        if err != nil {
+            return fmt.Errorf("decode requests: %w", err)
+        }
+        if err := msgpack.Unmarshal(requestsBytes, &requests); err != nil {
+            return fmt.Errorf("unmarshal requests: %w", err)
+        }
+    }
+
+    // Push to Geth
+    parentHash := common.HexToHash(block.ParentHash)
+    status, err := s.engine.NewPayloadV4(ctx, execPayload, []common.Hash{}, &parentHash, requests)
+    if err != nil {
+        return fmt.Errorf("NewPayloadV4: %w", err)
+    }
+    if status.Status == engine.INVALID {
+        return fmt.Errorf("payload invalid: %s", *status.ValidationError)
+    }
+
+    // Update fork choice
+    fcs := engine.ForkchoiceStateV1{
+        HeadBlockHash:      execPayload.BlockHash,
+        SafeBlockHash:      execPayload.BlockHash,
+        FinalizedBlockHash: execPayload.BlockHash,
+    }
+    _, err = s.engine.ForkchoiceUpdatedV3(ctx, fcs, nil)
+    return err
+}
+```
+
+After execution, the block is saved to the member's local PostgreSQL. On startup, the syncer queries Geth for its current head block and resumes from there — so restarts don't re-execute the entire chain. See the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/03-member-nodes/pkg/sync/syncer.go) for the complete sync loop.
 
 ## Application Wiring
 
@@ -372,11 +394,15 @@ func (app *MemberNodesApp) runLeaderLoop() {
 }
 ```
 
-**Member mode** just needs PostgreSQL and the syncer — no Redis, no Geth, no block building:
+**Member mode** creates its own Geth Engine API client and passes it to the syncer, so each member is a full execution node:
 
 ```go
 if cfg.Mode == "member" {
-    app.syncer = syncpkg.NewSyncer(cfg.LeaderURL, payloadStore, logger)
+    jwtBytes, _ := hex.DecodeString(cfg.JWTSecret)
+    engineCl, _ := ethclient.NewEngineClient(ctx, cfg.EthClientURL, jwtBytes)
+
+    syncEngine := &syncerEngineAdapter{client: engineCl}
+    app.syncer = syncpkg.NewSyncer(cfg.LeaderURL, payloadStore, syncEngine, logger)
 } else {
     // Full leader setup: Redis, Geth, leader election, block builder, API server
 }
@@ -384,10 +410,10 @@ if cfg.Mode == "member" {
 
 ## Running It
 
-Start the infrastructure:
+Start the infrastructure. The compose file includes a second Geth and PostgreSQL instance for the member node:
 
 ```bash
-docker compose up -d geth redis postgres
+docker compose up -d geth geth-member redis postgres postgres-member
 ```
 
 Run the leader:
@@ -407,25 +433,42 @@ level=INFO msg="Became leader" instanceID=leader-1
 level=INFO msg="Initialized from Geth" component=BlockBuilder height=0 hash=0x40a4ba...
 ```
 
-Run a member node:
+Send a transaction to trigger block production (using [Foundry's `cast`](https://book.getfoundry.sh/cast/)):
+
+```bash
+cast send --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+    --rpc-url http://localhost:8545 \
+    --value 1wei 0x0000000000000000000000000000000000000001
+```
+
+```text
+level=INFO msg="Block finalized" component=BlockBuilder height=1 hash=0x8091f6... txs=1
+```
+
+Run a member node (with its own Geth instance):
 
 ```bash
 go run ./cmd/main.go \
     --instance-id member-1 \
     --mode member \
     --leader-url http://localhost:8090 \
+    --eth-client-url http://localhost:8552 \
+    --postgres-url "postgres://postgres:postgres@localhost:5433/consensus?sslmode=disable" \
     --health-addr :8081
 ```
 
 ```text
 level=INFO msg="Starting consensus node" instanceID=member-1 mode=member
+level=INFO msg="Resuming sync from Geth head" component=Syncer block=0
 level=INFO msg="Member node started" leaderURL=http://localhost:8090
 ```
 
-Once the leader finalizes blocks, the member syncs them:
+Each member needs its own Geth and PostgreSQL instance. The `geth-member` service in docker-compose maps Geth's Engine API to port 8552 and `postgres-member` maps PostgreSQL to port 5433. The member's syncer fetches blocks from the leader's HTTP API, executes them on its local Geth, and stores the results in its own PostgreSQL.
+
+Once the leader finalizes blocks, the member syncs and executes them:
 
 ```text
-level=INFO msg="Synced blocks" count=1 latest=1
+level=INFO msg="Synced blocks" component=Syncer count=1 latest=1
 ```
 
 ### Health Checks
@@ -455,7 +498,7 @@ curl localhost:8081/health  # OK (mode=member, lastSynced=1, totalSynced=1)
 
 ## What's Next
 
-We now have a distributed consensus system with leader election, durable storage, and horizontally scalable member nodes. In **Part 4: CometBFT Integration**, we'll replace the custom leader election with proper BFT consensus — multiple validators that agree on blocks through voting rounds.
+We now have a distributed consensus system with leader election, durable storage, and horizontally scalable member nodes that are full execution replicas. In **Part 4: CometBFT Integration**, we'll replace the custom leader election with proper BFT consensus — multiple validators that agree on blocks through voting rounds.
 
 ---
 
