@@ -563,12 +563,12 @@ Scrape `http://localhost:8080/metrics` to monitor your consensus layer.
 
 ## What's Next
 
-We now have a production-ready single-node consensus. But what happens when this node fails? In **Part 3: Redis-Based Distributed Consensus**, we'll add:
+We now have a production-ready single-node consensus. But what happens when this node fails? In **Part 3: Distributed Consensus with Redis, PostgreSQL, and Member Nodes**, we'll add:
 
-- Leader election
-- State synchronization across nodes
-- Follower nodes that can take over
-- Redis streams for coordination
+- Leader election with Redis
+- Durable payload storage in PostgreSQL
+- An HTTP API for block sync
+- Horizontally scalable member nodes
 
 ---
 
