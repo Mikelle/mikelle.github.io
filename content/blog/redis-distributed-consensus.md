@@ -70,7 +70,7 @@ func NewClient(addr, password, streamName string) (*Client, error) {
 }
 ```
 
-The client also exposes `Set`, `Get`, `SetNX`, `Del` for leader election and state, plus `PublishBlock` for the Redis stream — see the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/03-member-nodes/pkg/redis/client.go).
+The client also exposes `Set`, `Get`, `SetNX`, `Del` for state management, plus `PublishBlock` for the Redis stream and two Lua-script-backed atomic operations for leader election: `RenewIfValue` (renew a lease only if we still hold it) and `DelIfValue` (release a lock only if it's ours) — see the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/03-member-nodes/pkg/redis/client.go).
 
 ## Leader Election
 
@@ -105,6 +105,7 @@ func (le *LeaderElection) tryAcquireOrRenew(ctx context.Context) {
     // Try to acquire
     acquired, err := le.client.SetNX(ctx, leaderKey, le.instanceID, le.leaseTTL)
     if err != nil {
+        le.logger.Error("Failed to acquire leadership", "error", err)
         le.isLeader = false
         return
     }
@@ -117,27 +118,26 @@ func (le *LeaderElection) tryAcquireOrRenew(ctx context.Context) {
         return
     }
 
-    // Key exists — check if we're the holder
-    currentLeader, err := le.client.Get(ctx, leaderKey)
+    // Atomically renew only if we still hold the lock
+    renewed, err := le.client.RenewIfValue(ctx, leaderKey, le.instanceID, le.leaseTTL)
     if err != nil {
+        le.logger.Warn("Failed to renew lease", "error", err)
         le.isLeader = false
         return
     }
 
-    if currentLeader == le.instanceID {
-        // Renew the lease
-        le.client.Set(ctx, leaderKey, le.instanceID, le.leaseTTL)
+    if renewed {
         le.isLeader = true
     } else {
         if le.isLeader {
-            le.logger.Info("Lost leadership", "newLeader", currentLeader)
+            le.logger.Info("Lost leadership")
         }
         le.isLeader = false
     }
 }
 ```
 
-On graceful shutdown, we delete the key so failover is instant rather than waiting for the 5-second TTL:
+On graceful shutdown, we conditionally delete the key — only if it still holds our instance ID — so failover is instant rather than waiting for the 5-second TTL:
 
 ```go
 func (le *LeaderElection) Stop() {
@@ -153,7 +153,7 @@ func (le *LeaderElection) Stop() {
     if wasLeader {
         ctx, cancel := context.WithTimeout(context.Background(), time.Second)
         defer cancel()
-        le.client.Del(ctx, leaderKey)
+        le.client.DelIfValue(ctx, leaderKey, le.instanceID)
     }
 }
 ```
@@ -242,6 +242,13 @@ func (s *PayloadStore) GetPayloadsAfter(ctx context.Context, afterNumber uint64,
 The block builder is the same as Part 2, with two additions after finalization — store in PostgreSQL and publish to Redis:
 
 ```go
+// Update local head (block is finalized on Geth regardless of storage outcome)
+bb.executionHead = &state.ExecutionHead{
+    BlockHeight: payload.Number,
+    BlockHash:   payload.BlockHash[:],
+    BlockTime:   payload.Timestamp,
+}
+
 // Store in PostgreSQL
 if bb.payloadStore != nil {
     pgPayload := &postgres.Payload{
@@ -253,7 +260,7 @@ if bb.payloadStore != nil {
         Timestamp:    int64(payload.Timestamp),
     }
     if err := bb.payloadStore.SavePayload(ctx, pgPayload); err != nil {
-        bb.logger.Warn("Failed to store payload in PostgreSQL", "error", err)
+        return fmt.Errorf("store payload in PostgreSQL: %w", err)
     }
 }
 
@@ -261,12 +268,12 @@ if bb.payloadStore != nil {
 if bb.redisClient != nil {
     if err := bb.redisClient.PublishBlock(ctx, payload.BlockHash.Hex(),
         executionPayloadStr, payload.Number); err != nil {
-        bb.logger.Warn("Failed to publish block to Redis", "error", err)
+        return fmt.Errorf("publish block to Redis: %w", err)
     }
 }
 ```
 
-Both are best-effort — if either fails, the block is still finalized on Geth. PostgreSQL is the durable store; the Redis stream is for real-time notification.
+The local head is updated first so the next block builds from the right point even if storage fails. PostgreSQL and Redis failures return hard errors — if either fails, the operator knows the block didn't reach members. The Redis stream is for real-time notification.
 
 ## HTTP API for Member Sync
 
@@ -274,28 +281,35 @@ The leader exposes a simple HTTP API backed by PostgreSQL:
 
 ```go
 func NewServer(store *postgres.PayloadStore, addr string, logger *slog.Logger) *Server {
+    s := &Server{store: store, logger: logger}
+
     mux := http.NewServeMux()
     mux.HandleFunc("/blocks/latest", s.handleLatestBlock)
     mux.HandleFunc("/blocks/", s.handleGetBlock)      // /blocks/{number or hash}
     mux.HandleFunc("/blocks", s.handleGetBlocksAfter)  // /blocks?after=N&limit=M
 
     s.server = &http.Server{
-        Addr:    addr,
-        Handler: mux,
+        Addr:         addr,
+        Handler:      mux,
+        ReadTimeout:  10 * time.Second,
+        WriteTimeout: 10 * time.Second,
     }
     return s
 }
 ```
 
-The batch endpoint is what members use to sync. It returns blocks after a given height:
+The batch endpoint is what members use to sync. It returns blocks after a given height, with the limit capped at 1000:
 
 ```go
 func (s *Server) handleGetBlocksAfter(w http.ResponseWriter, r *http.Request) {
     after, _ := strconv.ParseUint(r.URL.Query().Get("after"), 10, 64)
 
     limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
-    if limit == 0 || limit > 1000 {
+    if limit <= 0 {
         limit = 100
+    }
+    if limit > 1000 {
+        limit = 1000
     }
 
     payloads, err := s.store.GetPayloadsAfter(r.Context(), after, limit)
@@ -314,7 +328,7 @@ type ExecutionEngine interface {
         requests [][]byte) (engine.PayloadStatusV1, error)
     ForkchoiceUpdatedV3(ctx context.Context, state engine.ForkchoiceStateV1,
         attrs *engine.PayloadAttributes) (engine.ForkChoiceResponse, error)
-    HeaderByNumber(ctx context.Context, number interface{}) (*types.Header, error)
+    HeaderByNumber(ctx context.Context, number *big.Int) (*types.Header, error)
 }
 ```
 
@@ -351,7 +365,11 @@ func (s *Syncer) executeBlock(ctx context.Context, block *BlockResponse) error {
         return fmt.Errorf("NewPayloadV4: %w", err)
     }
     if status.Status == engine.INVALID {
-        return fmt.Errorf("payload invalid: %s", *status.ValidationError)
+        msg := "unknown"
+        if status.ValidationError != nil {
+            msg = *status.ValidationError
+        }
+        return fmt.Errorf("payload invalid: %s", msg)
     }
 
     // Update fork choice
@@ -360,8 +378,11 @@ func (s *Syncer) executeBlock(ctx context.Context, block *BlockResponse) error {
         SafeBlockHash:      execPayload.BlockHash,
         FinalizedBlockHash: execPayload.BlockHash,
     }
-    _, err = s.engine.ForkchoiceUpdatedV3(ctx, fcs, nil)
-    return err
+    if _, err := s.engine.ForkchoiceUpdatedV3(ctx, fcs, nil); err != nil {
+        return fmt.Errorf("ForkchoiceUpdatedV3: %w", err)
+    }
+
+    return nil
 }
 ```
 
@@ -492,8 +513,8 @@ curl localhost:8081/health  # OK (mode=member, lastSynced=1, totalSynced=1)
 |----------|----------|
 | Leader crashes | Lock expires (5s TTL), standby acquires |
 | Leader shuts down gracefully | Lock deleted immediately, instant failover |
-| Member loses leader connection | Retries every 100ms, catches up when reconnected |
-| PostgreSQL unavailable | Leader logs warning, blocks still finalized on Geth |
+| Member loses leader connection | Exponential backoff (200ms–30s), catches up when reconnected |
+| PostgreSQL unavailable | Leader returns error, block finalized on Geth but not stored |
 | Redis unavailable | All nodes lose leadership, block production pauses |
 
 ## What's Next
