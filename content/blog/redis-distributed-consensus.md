@@ -1,7 +1,7 @@
 ---
 title: "Distributed Consensus with Redis, PostgreSQL, and Member Nodes"
-date: 2026-01-17
-draft: true
+date: 2026-02-09
+draft: false
 description: "Adding fault tolerance with Redis leader election, PostgreSQL payload storage, and member nodes that execute blocks on their own Geth."
 tags: ["consensus", "geth", "mev", "redis", "postgres", "tutorial"]
 ---
