@@ -54,7 +54,7 @@ This mirrors Ethereum's post-merge architecture — separate consensus and execu
 | | Redis Consensus (Part 3) | CometBFT (Part 4) |
 |---|---|---|
 | Fault tolerance | Crash only | Byzantine (malicious actors) |
-| Finality | Probabilistic | Instant (single slot) |
+| Finality | Leader-determined | Instant (single slot) |
 | Validators | Single leader | Multi-validator voting |
 | Network trust | Trusted | Untrusted |
 
@@ -222,7 +222,7 @@ func (app *GethConsensusApp) validatePayload(
     payload *engine.ExecutableData,
 ) error {
     if app.execHead == nil {
-        return nil
+        return fmt.Errorf("execution head not initialized")
     }
 
     expectedHeight := app.execHead.BlockHeight + 1
@@ -254,7 +254,9 @@ func (app *GethConsensusApp) FinalizeBlock(ctx context.Context,
     req *abcitypes.RequestFinalizeBlock,
 ) (*abcitypes.ResponseFinalizeBlock, error) {
     var msg MsgExecutionPayload
-    json.Unmarshal(req.Txs[0], &msg)
+    if err := json.Unmarshal(req.Txs[0], &msg); err != nil {
+        return nil, fmt.Errorf("unmarshal payload: %w", err)
+    }
 
     payload := msg.ExecutionPayload
     requests := msg.Requests
@@ -268,11 +270,11 @@ func (app *GethConsensusApp) FinalizeBlock(ctx context.Context,
     }
 
     if status.Status == engine.INVALID {
-        msg := "unknown"
+        errMsg := "unknown"
         if status.ValidationError != nil {
-            msg = *status.ValidationError
+            errMsg = *status.ValidationError
         }
-        return nil, fmt.Errorf("payload invalid: %s", msg)
+        return nil, fmt.Errorf("payload invalid: %s", errMsg)
     }
 
     // Update forkchoice — instant finality
@@ -281,7 +283,9 @@ func (app *GethConsensusApp) FinalizeBlock(ctx context.Context,
         SafeBlockHash:      payload.BlockHash,
         FinalizedBlockHash: payload.BlockHash, // ← instant finality
     }
-    app.engineCl.ForkchoiceUpdatedV3(ctx, fcs, nil)
+    if _, err := app.engineCl.ForkchoiceUpdatedV3(ctx, fcs, nil); err != nil {
+        return nil, fmt.Errorf("forkchoice update: %w", err)
+    }
 
     // Update local state
     app.execHead = &ExecutionHead{
@@ -290,7 +294,15 @@ func (app *GethConsensusApp) FinalizeBlock(ctx context.Context,
         BlockTime:   payload.Timestamp,
     }
 
-    app.saveExecutionHead(app.execHead)
+    if err := app.saveExecutionHead(app.execHead); err != nil {
+        return nil, fmt.Errorf("save execution head: %w", err)
+    }
+
+    // Return one TxResult per transaction in the block
+    txResults := make([]*abcitypes.ExecTxResult, len(req.Txs))
+    for i := range req.Txs {
+        txResults[i] = &abcitypes.ExecTxResult{Code: 0}
+    }
 
     return &abcitypes.ResponseFinalizeBlock{
         AppHash:   payload.BlockHash.Bytes(),
