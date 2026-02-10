@@ -33,7 +33,7 @@ Each validator runs a CometBFT node paired with a Geth instance. CometBFT handle
 │  │  ├─ PrepareProposal() → Build block via Engine API   │ │
 │  │  ├─ ProcessProposal() → Validate proposed block      │ │
 │  │  ├─ FinalizeBlock()   → Execute via NewPayload       │ │
-│  │  └─ Commit()          → Persist state                │ │
+│  │  └─ Commit()          → Acknowledge block             │ │
 │  └──────────────────────────────────────────────────────┘ │
 │                         │                                  │
 │                Engine API (HTTP + JWT)                      │
@@ -422,7 +422,7 @@ The CLI accepts `--cmt-home` (CometBFT data directory), `--eth-client-url` (Geth
 Install CometBFT:
 
 ```bash
-go install github.com/cometbft/cometbft/cmd/cometbft@v0.38.11
+go install github.com/cometbft/cometbft/cmd/cometbft@v0.38.21
 cometbft version
 ```
 
