@@ -347,7 +347,9 @@ func (app *GethConsensusApp) InitChain(ctx context.Context,
         BlockTime:   header.Time,
     }
 
-    app.saveExecutionHead(app.execHead)
+    if err := app.saveExecutionHead(app.execHead); err != nil {
+        return nil, fmt.Errorf("save execution head: %w", err)
+    }
     return &abcitypes.ResponseInitChain{}, nil
 }
 ```
