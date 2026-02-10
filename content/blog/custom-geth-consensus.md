@@ -331,7 +331,7 @@ State machine:
 
 ## What's Next
 
-**[Part 2: Single Node Consensus](/blog/single-node-consensus)** builds a complete implementation with full application structure, retry logic, metrics, and configuration management. **[Part 3: Distributed Consensus](/blog/redis-distributed-consensus)** adds Redis leader election, PostgreSQL storage, and horizontally scalable member nodes.
+**[Part 2: Single Node Consensus](/blog/single-node-consensus)** builds a complete implementation with full application structure, retry logic, metrics, and configuration management. **[Part 3: Distributed Consensus](/blog/redis-distributed-consensus)** adds Redis leader election, PostgreSQL storage, and horizontally scalable member nodes. **[Part 4: CometBFT Integration](/blog/cometbft-geth-consensus)** replaces custom leader election with BFT consensus for instant finality and multi-validator voting.
 
 ---
 

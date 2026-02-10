@@ -537,7 +537,7 @@ curl localhost:8081/health  # OK (mode=member, lastSynced=1, totalSynced=1)
 
 ## What's Next
 
-We now have a distributed consensus system with leader election, durable storage, and horizontally scalable member nodes that are full execution replicas. In **Part 4: CometBFT Integration**, we'll replace the custom leader election with proper BFT consensus — multiple validators that agree on blocks through voting rounds.
+We now have a distributed consensus system with leader election, durable storage, and horizontally scalable member nodes that are full execution replicas. In **[Part 4: CometBFT Integration](/blog/cometbft-geth-consensus)**, we replace the custom leader election with proper BFT consensus — multiple validators that agree on blocks through voting rounds, with instant finality.
 
 ---
 
