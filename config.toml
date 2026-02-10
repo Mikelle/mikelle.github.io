@@ -4,7 +4,7 @@ languageCode = "en-us"
 title = "Mikhail Wall"
 
 [params]
-  description = "Protocol Engineer. L2 infrastructure, MEV, DeFi."
+  description = "Protocol Engineer. L2, MEV, DeFi infrastructure."
   author = "Mikhail Wall"
   email = "mikhwall@gmail.com"
   github = "Mikelle"

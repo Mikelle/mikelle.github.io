@@ -29,7 +29,7 @@
   <text x="90" y="195" font-family="monospace" font-size="32" font-weight="bold" fill="#c9d1d9">Mikhail Wall</text>
 
   <!-- Role -->
-  <text x="90" y="235" font-family="monospace" font-size="20" fill="#a0a8b2">Protocol Engineer. L2 infrastructure, MEV, DeFi.</text>
+  <text x="90" y="235" font-family="monospace" font-size="20" fill="#a0a8b2">Protocol Engineer. L2, MEV, DeFi infrastructure.</text>
 
   <!-- Prompt 2 -->
   <text x="90" y="300" font-family="monospace" font-size="20" fill="#3fb950">~$</text>
