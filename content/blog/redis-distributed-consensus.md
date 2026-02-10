@@ -178,7 +178,7 @@ func (le *LeaderElection) Stop() {
 
 ## Redis State Manager
 
-Same `StateManager` interface from Part 2 — the implementation changes from in-memory to Redis-backed with JSON serialization and a 5-minute TTL:
+Same `StateManager` interface from [Part 2](/blog/single-node-consensus) — the implementation changes from in-memory to Redis-backed with JSON serialization and a 5-minute TTL:
 
 ```go
 type RedisStateManager struct {
@@ -257,7 +257,7 @@ func (s *PayloadStore) GetPayloadsAfter(ctx context.Context, afterNumber uint64,
 
 ## Block Builder Changes
 
-The block builder is the same as Part 2, with two additions after finalization — store in PostgreSQL and publish to Redis:
+The block builder is the same as [Part 2](/blog/single-node-consensus), with two additions after finalization — store in PostgreSQL and publish to Redis:
 
 ```go
 // Update local head (block is finalized on Geth regardless of storage outcome)
@@ -410,7 +410,7 @@ After execution, the block is saved to the member's local PostgreSQL. On startup
 
 The application runs in two modes: `--mode leader` or `--mode member`.
 
-**Leader mode** sets up the full stack — Redis, Geth, PostgreSQL, leader election, block production, and the HTTP API. The run loop is the same as Part 2 with one addition: only produce blocks when elected leader.
+**Leader mode** sets up the full stack — Redis, Geth, PostgreSQL, leader election, block production, and the HTTP API. The run loop is the same as [Part 2](/blog/single-node-consensus) with one addition: only produce blocks when elected leader.
 
 ```go
 func (app *MemberNodesApp) runLeaderLoop() {

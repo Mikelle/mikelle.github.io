@@ -65,7 +65,7 @@ Sensible defaults:
 
 ## State Manager
 
-Between building and finalizing a block, we need to persist the payload. Why not just pass the struct directly? Because in Part 3, this state moves to Redis — so we serialize it now to keep the interface consistent. The payload and [EIP-7685](https://eips.ethereum.org/EIPS/eip-7685) requests are encoded as msgpack + base64 strings.
+Between building and finalizing a block, we need to persist the payload. Why not just pass the struct directly? Because in [Part 3](/blog/redis-distributed-consensus), this state moves to Redis — so we serialize it now to keep the interface consistent. The payload and [EIP-7685](https://eips.ethereum.org/EIPS/eip-7685) requests are encoded as msgpack + base64 strings.
 
 ```go
 package state
@@ -91,7 +91,7 @@ type StateManager interface {
 }
 ```
 
-The `StateManager` interface is designed to be swappable. For single-node, `LocalStateManager` is a trivial in-memory implementation — see the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/02-single-node/pkg/state/state.go). Part 3 will replace it with Redis-backed state.
+The `StateManager` interface is designed to be swappable. For single-node, `LocalStateManager` is a trivial in-memory implementation — see the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/02-single-node/pkg/state/state.go). [Part 3](/blog/redis-distributed-consensus) will replace it with Redis-backed state.
 
 ## Retry Logic with Exponential Backoff
 
@@ -124,7 +124,7 @@ You'll see this used throughout the block builder below.
 
 ## Block Builder
 
-The block builder orchestrates the two-phase process from Part 1, with retry logic around every Engine API call.
+The block builder orchestrates the two-phase process from [Part 1](/blog/custom-geth-consensus), with retry logic around every Engine API call.
 
 ```go
 type BlockBuilder struct {
@@ -563,7 +563,7 @@ Scrape `http://localhost:8080/metrics` to monitor your consensus layer.
 
 ## What's Next
 
-We now have a production-ready single-node consensus. But what happens when this node fails? In **Part 3: Distributed Consensus with Redis, PostgreSQL, and Member Nodes**, we'll add:
+We now have a production-ready single-node consensus. But what happens when this node fails? In **[Part 3: Distributed Consensus with Redis, PostgreSQL, and Member Nodes](/blog/redis-distributed-consensus)**, we'll add:
 
 - Leader election with Redis
 - Durable payload storage in PostgreSQL
