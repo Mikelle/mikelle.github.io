@@ -181,6 +181,10 @@ func (app *GethConsensusApp) buildBlock(ctx context.Context,
         return nil, nil, fmt.Errorf("forkchoice updated: %w", err)
     }
 
+    if response.PayloadID == nil {
+        return nil, nil, fmt.Errorf("no payload ID returned")
+    }
+
     // Wait for Geth to build the block
     time.Sleep(app.buildDelay)
 
@@ -243,7 +247,34 @@ func (app *GethConsensusApp) validatePayload(
 }
 ```
 
-If validation fails, the validator returns `REJECT` and CometBFT counts it as a vote against the proposal. If >1/3 of validators reject, the round fails and a new proposer is selected.
+`ProcessProposal` unmarshals the proposed transaction, runs validation, and returns the vote:
+
+```go
+func (app *GethConsensusApp) ProcessProposal(ctx context.Context,
+    req *abcitypes.RequestProcessProposal,
+) (*abcitypes.ResponseProcessProposal, error) {
+    if len(req.Txs) == 0 {
+        return &abcitypes.ResponseProcessProposal{
+            Status: abcitypes.ResponseProcessProposal_REJECT}, nil
+    }
+
+    var msg MsgExecutionPayload
+    if err := json.Unmarshal(req.Txs[0], &msg); err != nil {
+        return &abcitypes.ResponseProcessProposal{
+            Status: abcitypes.ResponseProcessProposal_REJECT}, nil
+    }
+
+    if err := app.validatePayload(msg.ExecutionPayload); err != nil {
+        return &abcitypes.ResponseProcessProposal{
+            Status: abcitypes.ResponseProcessProposal_REJECT}, nil
+    }
+
+    return &abcitypes.ResponseProcessProposal{
+        Status: abcitypes.ResponseProcessProposal_ACCEPT}, nil
+}
+```
+
+If validation fails, the validator returns `REJECT` and CometBFT counts it as a vote against the proposal. If >1/3 of validators reject, the round fails — CometBFT increments the round number, selects the next proposer via round-robin, and starts a new proposal with configurable timeouts (default 3s propose, 1s prevote/precommit).
 
 ## FinalizeBlock — Executing with Instant Finality
 
@@ -358,7 +389,7 @@ func (app *GethConsensusApp) InitChain(ctx context.Context,
 
 ## Application Wiring
 
-The `runNode()` function wires everything together — Engine API client, Badger DB, ABCI app, and CometBFT node:
+The `runNode()` function wires everything together — Engine API client, Badger DB, ABCI app, and CometBFT node. The `engineClientAdapter` bridges our concrete `ethclient.EngineClient` to the `app.EngineClient` interface, keeping the ABCI app testable without a real Geth connection:
 
 ```go
 func runNode(c *cli.Context) error {
@@ -447,8 +478,11 @@ docker compose up -d geth
 cd 04-cometbft-consensus
 go run ./cmd/main.go \
   --cmt-home ~/.cometbft \
-  --eth-client-url http://localhost:8551
+  --eth-client-url http://localhost:8551 \
+  --jwt-secret 688f5d737bad920bdfb2fc2f488d6b6209eebeb7b7f7710df3571de7fda67a32
 ```
+
+The `--jwt-secret` flag defaults to the shared secret in the repo's [`jwt/jwt.hex`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/jwt/jwt.hex), so you can omit it if using the default setup.
 
 ### Expected Output
 
@@ -471,6 +505,23 @@ time=... level=INFO msg="PrepareProposal called" height=2
 
 Each line of output traces the consensus flow: the proposer builds a block (`PrepareProposal`), all validators validate it (`ProcessProposal`), and then everyone executes it (`FinalizeBlock`).
 
+### Multi-Validator Setup
+
+The above runs a single validator. To test with multiple validators, you'd create separate CometBFT home directories for each, configure the genesis to include all validator public keys, and set persistent peers so they can discover each other:
+
+```bash
+# Initialize three validators
+cometbft init --home ~/.cometbft-0
+cometbft init --home ~/.cometbft-1
+cometbft init --home ~/.cometbft-2
+
+# Collect all three public keys into each genesis.json validators array
+# Set persistent_peers in each config.toml to include the other nodes' IDs
+# Each validator needs its own Geth instance on separate ports
+```
+
+Each validator runs its own `cometbft-geth` process paired with a dedicated Geth instance. CometBFT handles peer discovery, proposer rotation, and vote aggregation automatically — no changes to the ABCI application code.
+
 ## What's Next
 
 Over four parts we've gone from raw Engine API calls to a Byzantine-fault-tolerant consensus layer:
@@ -480,7 +531,7 @@ Over four parts we've gone from raw Engine API calls to a Byzantine-fault-tolera
 - **[Part 3](/blog/redis-distributed-consensus)**: Distributed — Redis leader election, PostgreSQL storage, member nodes
 - **Part 4**: BFT consensus — CometBFT voting, instant finality, multi-validator
 
-From here, CometBFT opens up several production extensions: **vote extensions** for embedding extra data in consensus votes (useful for preconfirmations), **state sync** for fast node bootstrapping, and **encrypted mempools** for MEV protection. The [mev-commit](https://github.com/primev/mev-commit) project builds on this pattern for its production consensus layer.
+From here, CometBFT opens up several production extensions: **[vote extensions](https://docs.cometbft.com/v0.38/spec/abci/abci++_app_requirements#vote-extensions)** for embedding extra data in consensus votes (useful for preconfirmations), **[state sync](https://docs.cometbft.com/v0.38/core/state-sync)** for fast node bootstrapping, and **encrypted mempools** for MEV protection. The [mev-commit](https://github.com/primev/mev-commit) project builds on this pattern for its production consensus layer.
 
 ---
 
