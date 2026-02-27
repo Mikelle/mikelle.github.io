@@ -14,10 +14,10 @@ Maximal Extractable Value (formerly Miner Extractable Value) refers to the profi
 
 ## The Evolution
 
-1. **Early days** — Simple arbitrage bots competing in mempool
-2. **Flashbots era** — Private mempools, MEV auctions
-3. **PBS** — Proposer-builder separation
-4. **Pre-confirmations** — Committing to inclusion before the block
+1. **Early days**: Simple arbitrage bots competing in mempool
+2. **Flashbots era**: Private mempools, MEV auctions
+3. **PBS**: Proposer-builder separation
+4. **Pre-confirmations**: Committing to inclusion before the block
 
 ## Where we're heading
 

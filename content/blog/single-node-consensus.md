@@ -65,7 +65,7 @@ Sensible defaults:
 
 ## State Manager
 
-Between building and finalizing a block, we need to persist the payload. Why not just pass the struct directly? Because in [Part 3](/blog/redis-distributed-consensus), this state moves to Redis — so we serialize it now to keep the interface consistent. The payload and [EIP-7685](https://eips.ethereum.org/EIPS/eip-7685) requests are encoded as msgpack + base64 strings.
+Between building and finalizing a block, we need to persist the payload. Why not just pass the struct directly? Because in [Part 3](/blog/redis-distributed-consensus), this state moves to Redis, so we serialize it now to keep the interface consistent. The payload and [EIP-7685](https://eips.ethereum.org/EIPS/eip-7685) requests are encoded as msgpack + base64 strings.
 
 ```go
 package state

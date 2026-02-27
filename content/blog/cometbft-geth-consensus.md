@@ -8,7 +8,7 @@ tags: ["consensus", "geth", "mev", "cometbft", "tutorial"]
 
 *Part 4 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
 
-In [Part 3](/blog/redis-distributed-consensus), we built a distributed consensus system with Redis leader election and member nodes. That system tolerates crashes — if the leader dies, a standby takes over. But it can't handle a *malicious* leader that proposes invalid blocks. This article replaces the entire custom stack with [CometBFT](https://cometbft.com/) (formerly Tendermint), giving us Byzantine fault tolerance, multi-validator voting, and instant finality. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/04-cometbft-consensus).
+In [Part 3](/blog/redis-distributed-consensus), we built a distributed consensus system with Redis leader election and member nodes. That system tolerates crashes: if the leader dies, a standby takes over. But it can't handle a *malicious* leader that proposes invalid blocks. This article replaces the entire custom stack with [CometBFT](https://cometbft.com/) (formerly Tendermint), giving us Byzantine fault tolerance, multi-validator voting, and instant finality. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/04-cometbft-consensus).
 
 ## What We're Building
 
@@ -47,7 +47,7 @@ Each validator runs a CometBFT node paired with a Geth instance. CometBFT handle
 └───────────────────────────────────────────────────────────┘
 ```
 
-This mirrors Ethereum's post-merge architecture — separate consensus and execution layers connected by the Engine API. The difference: CometBFT replaces the Beacon Chain, giving us BFT consensus with configurable validators.
+This mirrors Ethereum's post-merge architecture: separate consensus and execution layers connected by the Engine API. The difference: CometBFT replaces the Beacon Chain, giving us BFT consensus with configurable validators.
 
 ### Redis Consensus vs CometBFT
 
@@ -105,7 +105,7 @@ Height H
 
 ## ABCI Application
 
-The **Application Blockchain Interface (ABCI)** is CometBFT's protocol for communicating with application logic. CometBFT handles networking, consensus rounds, and validator management — our app just needs to implement the interface methods that build, validate, and execute blocks.
+The **Application Blockchain Interface (ABCI)** is CometBFT's protocol for communicating with application logic. CometBFT handles networking, consensus rounds, and validator management. Our app just needs to implement the interface methods that build, validate, and execute blocks.
 
 The core types:
 
@@ -274,7 +274,7 @@ func (app *GethConsensusApp) ProcessProposal(ctx context.Context,
 }
 ```
 
-If validation fails, the validator returns `REJECT` and CometBFT counts it as a vote against the proposal. If >1/3 of validators reject, the round fails — CometBFT increments the round number, selects the next proposer via round-robin, and starts a new proposal with configurable timeouts (default 3s propose, 1s prevote/precommit).
+If validation fails, the validator returns `REJECT` and CometBFT counts it as a vote against the proposal. If >1/3 of validators reject, the round fails. CometBFT increments the round number, selects the next proposer via round-robin, and starts a new proposal with configurable timeouts (default 3s propose, 1s prevote/precommit).
 
 ## FinalizeBlock — Executing with Instant Finality
 
@@ -342,7 +342,7 @@ func (app *GethConsensusApp) FinalizeBlock(ctx context.Context,
 }
 ```
 
-The key line is `FinalizedBlockHash: payload.BlockHash`. In the Engine API, `FinalizedBlockHash` tells Geth that this block (and all ancestors) can never be reverted. On Ethereum mainnet, a block takes ~13 minutes to become finalized (2 epochs of Casper FFG). Here, every block is finalized the moment it's committed — because >2/3 of validators signed it, and BFT guarantees they can't equivocate.
+The key line is `FinalizedBlockHash: payload.BlockHash`. In the Engine API, `FinalizedBlockHash` tells Geth that this block (and all ancestors) can never be reverted. On Ethereum mainnet, a block takes ~13 minutes to become finalized (2 epochs of Casper FFG). Here, every block is finalized the moment it's committed, because >2/3 of validators signed it and BFT guarantees they can't equivocate.
 
 ## State Persistence
 
@@ -526,10 +526,10 @@ Each validator runs its own `cometbft-geth` process paired with a dedicated Geth
 
 Over four parts we've gone from raw Engine API calls to a Byzantine-fault-tolerant consensus layer:
 
-- **[Part 1](/blog/custom-geth-consensus)**: Engine API fundamentals — ForkchoiceUpdated, GetPayload, NewPayload
-- **[Part 2](/blog/single-node-consensus)**: Production single-node — retry logic, health checks, graceful shutdown
-- **[Part 3](/blog/redis-distributed-consensus)**: Distributed — Redis leader election, PostgreSQL storage, member nodes
-- **Part 4**: BFT consensus — CometBFT voting, instant finality, multi-validator
+- **[Part 1](/blog/custom-geth-consensus)**: Engine API fundamentals (ForkchoiceUpdated, GetPayload, NewPayload)
+- **[Part 2](/blog/single-node-consensus)**: Production single-node with retry logic, health checks, graceful shutdown
+- **[Part 3](/blog/redis-distributed-consensus)**: Distributed with Redis leader election, PostgreSQL storage, member nodes
+- **Part 4**: BFT consensus with CometBFT voting, instant finality, multi-validator
 
 From here, CometBFT opens up several production extensions: **[vote extensions](https://docs.cometbft.com/v0.38/spec/abci/abci++_app_requirements#vote-extensions)** for embedding extra data in consensus votes (useful for preconfirmations), **[state sync](https://docs.cometbft.com/v0.38/core/state-sync)** for fast node bootstrapping, and **encrypted mempools** for MEV protection. The [mev-commit](https://github.com/primev/mev-commit) project builds on this pattern for its production consensus layer.
 

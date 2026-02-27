@@ -14,9 +14,9 @@ This series builds a complete custom consensus layer from scratch. We'll start w
 
 ## Why Build Custom Consensus?
 
-- **Layer 2 chains** - Sequencers for rollups or app-specific chains
-- **Private networks** - Permissioned chains with custom block production
-- **Research** - Experimenting with new consensus mechanisms
+- **Layer 2 chains**: Sequencers for rollups or app-specific chains
+- **Private networks**: Permissioned chains with custom block production
+- **Research**: Experimenting with new consensus mechanisms
 
 The [mev-commit](https://github.com/primev/mev-commit) project uses custom consensus to enable preconfirmations.
 
@@ -60,7 +60,7 @@ docker compose up geth
 
 This starts Geth with the Engine API on port 8551 and HTTP RPC on 8545. The setup uses a custom [`genesis.json`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/genesis.json) for the private chain — see [`docker-compose.yml`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/docker-compose.yml) and [`geth-entrypoint.sh`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/geth-entrypoint.sh) for the full configuration.
 
-One important flag: `--miner.gasprice 1`. Geth's miner filters transactions whose effective tip is below this threshold during block building. The default (1 Mwei) silently drops transactions with low priority fees — a common gotcha on private chains where tools like `cast` default to minimal fees.
+One important flag: `--miner.gasprice 1`. Geth's miner filters transactions whose effective tip is below this threshold during block building. The default (1 Mwei) silently drops transactions with low priority fees. This is a common gotcha on private chains where tools like `cast` default to minimal fees.
 
 Once Geth is running, start the consensus client from the repo:
 

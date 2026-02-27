@@ -8,7 +8,7 @@ tags: ["consensus", "geth", "mev", "redis", "postgres", "tutorial"]
 
 *Part 3 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
 
-In [Part 2](/blog/single-node-consensus), we built a production-ready single-node consensus layer. But a single node is a single point of failure. This article adds Redis-based leader election for failover, PostgreSQL for durable payload storage, and member nodes that sync blocks from the leader and execute them on their own Geth instance — making each member a full execution replica. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/03-member-nodes).
+In [Part 2](/blog/single-node-consensus), we built a production-ready single-node consensus layer. But a single node is a single point of failure. This article adds Redis-based leader election for failover, PostgreSQL for durable payload storage, and member nodes that sync blocks from the leader and execute them on their own Geth instance, making each member a full execution replica. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/03-member-nodes).
 
 ## What We're Building
 
@@ -113,7 +113,7 @@ type LeaderElection struct {
 }
 ```
 
-Every 2 seconds, the election loop attempts to acquire or renew the lock. The renewal must be atomic — if we did a separate `Get` then `Set`, the key could expire between the two calls and another node could acquire it, leading to two nodes both believing they're leader. `RenewIfValue` uses a Lua script to check the value and renew the TTL in a single Redis operation:
+Every 2 seconds, the election loop attempts to acquire or renew the lock. The renewal must be atomic. If we did a separate `Get` then `Set`, the key could expire between the two calls and another node could acquire it, leading to two nodes both believing they're leader. `RenewIfValue` uses a Lua script to check the value and renew the TTL in a single Redis operation:
 
 ```go
 func (le *LeaderElection) tryAcquireOrRenew(ctx context.Context) {
@@ -155,7 +155,7 @@ func (le *LeaderElection) tryAcquireOrRenew(ctx context.Context) {
 }
 ```
 
-On graceful shutdown, we can't just `Del` the key — between checking `wasLeader` and calling `Del`, another node may have already acquired the lock, and we'd delete *their* lease. `DelIfValue` uses a Lua script to only delete the key if it still holds our instance ID:
+On graceful shutdown, we can't just `Del` the key. Between checking `wasLeader` and calling `Del`, another node may have already acquired the lock, and we'd delete *their* lease. `DelIfValue` uses a Lua script to only delete the key if it still holds our instance ID:
 
 ```go
 func (le *LeaderElection) Stop() {
@@ -291,7 +291,7 @@ if bb.redisClient != nil {
 }
 ```
 
-The local head is updated first so the next block builds from the right point even if storage fails. PostgreSQL and Redis failures return hard errors — if either fails, the operator knows the block didn't reach members. The Redis stream is for real-time notification.
+The local head is updated first so the next block builds from the right point even if storage fails. PostgreSQL and Redis failures return hard errors. If either fails, the operator knows the block didn't reach members. The Redis stream is for real-time notification.
 
 ## HTTP API for Member Sync
 
@@ -410,7 +410,7 @@ After execution, the block is saved to the member's local PostgreSQL. On startup
 
 The application runs in two modes: `--mode leader` or `--mode member`.
 
-**Leader mode** sets up the full stack — Redis, Geth, PostgreSQL, leader election, block production, and the HTTP API. The run loop is the same as [Part 2](/blog/single-node-consensus) with one addition: only produce blocks when elected leader.
+**Leader mode** sets up the full stack: Redis, Geth, PostgreSQL, leader election, block production, and the HTTP API. The run loop is the same as [Part 2](/blog/single-node-consensus) with one addition: only produce blocks when elected leader.
 
 ```go
 func (app *MemberNodesApp) runLeaderLoop() {
