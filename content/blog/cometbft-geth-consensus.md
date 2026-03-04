@@ -458,8 +458,13 @@ func runNode(c *cli.Context) error {
     abciApp := app.NewGethConsensusApp(db,
         &engineClientAdapter{client: engineCl}, logger)
 
-    // Load CometBFT config, validator key, and node key
+    // Load CometBFT config from config.toml
     config := cmtcfg.DefaultConfig()
+    config.SetRoot(cmtHome)
+
+    viper.SetConfigFile(filepath.Join(cmtHome, "config", "config.toml"))
+    viper.ReadInConfig()
+    viper.Unmarshal(config)
     config.SetRoot(cmtHome)
 
     pv := privval.LoadFilePV(
