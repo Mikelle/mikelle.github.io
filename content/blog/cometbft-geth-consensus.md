@@ -3,7 +3,7 @@ title: "CometBFT Integration: BFT Finality for Geth"
 date: 2026-02-10
 draft: true
 description: "Replacing custom leader election with CometBFT for Byzantine fault tolerance, multi-validator voting, and instant finality."
-tags: ["consensus", "geth", "mev", "cometbft", "tutorial"]
+tags: ["consensus", "geth", "cometbft", "tutorial"]
 ---
 
 *Part 4 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
@@ -554,12 +554,12 @@ Each line of output traces the consensus flow: the proposer builds a block (`Pre
 
 ### Multi-Validator Setup
 
-The above runs a single validator. To test BFT consensus, you need at least three validators (tolerating one Byzantine fault). Each validator gets its own CometBFT home directory, its own Geth instance, and a shared genesis that lists all validator public keys.
+The above runs a single validator. To test BFT consensus, you need at least four validators (tolerating one Byzantine fault, since n >= 3f+1). Each validator gets its own CometBFT home directory, its own Geth instance, and a shared genesis that lists all validator public keys.
 
 **1. Generate validator keys:**
 
 ```bash
-for i in {0..2}; do
+for i in {0..3}; do
   cometbft init --home ~/.cometbft-node$i
 done
 ```
@@ -589,6 +589,11 @@ Collect the public keys from each node's `priv_validator_key.json` and build a s
       "address": "VALIDATOR_2_ADDRESS",
       "pub_key": {"type": "tendermint/PubKeyEd25519", "value": "..."},
       "power": "100"
+    },
+    {
+      "address": "VALIDATOR_3_ADDRESS",
+      "pub_key": {"type": "tendermint/PubKeyEd25519", "value": "..."},
+      "power": "100"
     }
   ],
   "consensus_params": {
@@ -604,7 +609,7 @@ Each node needs to know how to reach the others. In each node's `config.toml`, s
 
 ```toml
 [p2p]
-persistent_peers = "node0_id@node0_host:26656,node1_id@node1_host:26656,node2_id@node2_host:26656"
+persistent_peers = "node0_id@node0_host:26656,node1_id@node1_host:26656,node2_id@node2_host:26656,node3_id@node3_host:26656"
 ```
 
 **4. Start all nodes:**
@@ -620,6 +625,9 @@ go run ./cmd/main.go --cmt-home ~/.cometbft-node1 --eth-client-url http://geth1:
 
 # Node 2
 go run ./cmd/main.go --cmt-home ~/.cometbft-node2 --eth-client-url http://geth2:8551
+
+# Node 3
+go run ./cmd/main.go --cmt-home ~/.cometbft-node3 --eth-client-url http://geth3:8551
 ```
 
 CometBFT handles peer discovery, proposer rotation, and vote aggregation automatically. No changes to the ABCI application code are needed.
