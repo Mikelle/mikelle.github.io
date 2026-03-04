@@ -344,6 +344,20 @@ func (app *GethConsensusApp) FinalizeBlock(ctx context.Context,
 
 The key line is `FinalizedBlockHash: payload.BlockHash`. In the Engine API, `FinalizedBlockHash` tells Geth that this block (and all ancestors) can never be reverted. On Ethereum mainnet, a block takes ~13 minutes to become finalized (2 epochs of Casper FFG). Here, every block is finalized the moment it's committed, because >2/3 of validators signed it and BFT guarantees they can't equivocate.
 
+## Commit — Acknowledging the Block
+
+CometBFT calls `Commit()` after `FinalizeBlock()` to persist application state. Since we already save the execution head to Badger in `FinalizeBlock`, there is nothing left to do here:
+
+```go
+func (app *GethConsensusApp) Commit(ctx context.Context,
+    req *abcitypes.RequestCommit,
+) (*abcitypes.ResponseCommit, error) {
+    return &abcitypes.ResponseCommit{}, nil
+}
+```
+
+This completes the ABCI lifecycle for each block: `PrepareProposal` builds it, `ProcessProposal` validates it, `FinalizeBlock` executes it, and `Commit` acknowledges that the app has finished persisting state.
+
 ## State Persistence
 
 The ABCI app uses [Badger](https://github.com/dgraph-io/badger) to persist the execution head across restarts. On startup, `Info()` loads the last known state; on first run, `InitChain()` queries Geth for the genesis block:
@@ -386,6 +400,39 @@ func (app *GethConsensusApp) InitChain(ctx context.Context,
 ```
 
 `LastBlockHeight` and `LastBlockAppHash` tell CometBFT where the app left off. If CometBFT's own block store is ahead, it replays any missing blocks through `FinalizeBlock`.
+
+The two helper functions use Badger's transaction API to read and write the execution head under a single key, `"execution_head"`. `db.View` opens a read-only transaction, `db.Update` opens a read-write transaction:
+
+```go
+const keyExecutionHead = "execution_head"
+
+func (app *GethConsensusApp) loadExecutionHead() (*ExecutionHead, error) {
+    var head ExecutionHead
+    err := app.db.View(func(txn *badger.Txn) error {
+        item, err := txn.Get([]byte(keyExecutionHead))
+        if err != nil {
+            return err
+        }
+        return item.Value(func(val []byte) error {
+            return json.Unmarshal(val, &head)
+        })
+    })
+    if err != nil {
+        return nil, err
+    }
+    return &head, nil
+}
+
+func (app *GethConsensusApp) saveExecutionHead(head *ExecutionHead) error {
+    data, err := json.Marshal(head)
+    if err != nil {
+        return err
+    }
+    return app.db.Update(func(txn *badger.Txn) error {
+        return txn.Set([]byte(keyExecutionHead), data)
+    })
+}
+```
 
 ## Application Wiring
 
@@ -507,20 +554,75 @@ Each line of output traces the consensus flow: the proposer builds a block (`Pre
 
 ### Multi-Validator Setup
 
-The above runs a single validator. To test with multiple validators, you'd create separate CometBFT home directories for each, configure the genesis to include all validator public keys, and set persistent peers so they can discover each other:
+The above runs a single validator. To test BFT consensus, you need at least three validators (tolerating one Byzantine fault). Each validator gets its own CometBFT home directory, its own Geth instance, and a shared genesis that lists all validator public keys.
+
+**1. Generate validator keys:**
 
 ```bash
-# Initialize three validators
-cometbft init --home ~/.cometbft-0
-cometbft init --home ~/.cometbft-1
-cometbft init --home ~/.cometbft-2
-
-# Collect all three public keys into each genesis.json validators array
-# Set persistent_peers in each config.toml to include the other nodes' IDs
-# Each validator needs its own Geth instance on separate ports
+for i in {0..2}; do
+  cometbft init --home ~/.cometbft-node$i
+done
 ```
 
-Each validator runs its own `cometbft-geth` process paired with a dedicated Geth instance. CometBFT handles peer discovery, proposer rotation, and vote aggregation automatically — no changes to the ABCI application code.
+Each `init` creates a unique validator key pair under `config/priv_validator_key.json`.
+
+**2. Create a shared genesis.json:**
+
+Collect the public keys from each node's `priv_validator_key.json` and build a single `genesis.json` with all validators. Copy this file to every node's `config/genesis.json`:
+
+```json
+{
+  "genesis_time": "2024-01-01T00:00:00.000000Z",
+  "chain_id": "geth-consensus",
+  "validators": [
+    {
+      "address": "VALIDATOR_0_ADDRESS",
+      "pub_key": {"type": "tendermint/PubKeyEd25519", "value": "..."},
+      "power": "100"
+    },
+    {
+      "address": "VALIDATOR_1_ADDRESS",
+      "pub_key": {"type": "tendermint/PubKeyEd25519", "value": "..."},
+      "power": "100"
+    },
+    {
+      "address": "VALIDATOR_2_ADDRESS",
+      "pub_key": {"type": "tendermint/PubKeyEd25519", "value": "..."},
+      "power": "100"
+    }
+  ],
+  "consensus_params": {
+    "block": {"max_bytes": "22020096", "max_gas": "-1"},
+    "validator": {"pub_key_types": ["ed25519"]}
+  }
+}
+```
+
+**3. Configure persistent peers:**
+
+Each node needs to know how to reach the others. In each node's `config.toml`, set `persistent_peers` to the other nodes' IDs and addresses. The node ID is the hex-encoded first 20 bytes of the node's public key, found in `config/node_key.json`:
+
+```toml
+[p2p]
+persistent_peers = "node0_id@node0_host:26656,node1_id@node1_host:26656,node2_id@node2_host:26656"
+```
+
+**4. Start all nodes:**
+
+Each validator runs its own `cometbft-geth` process paired with a dedicated Geth instance on separate Engine API ports:
+
+```bash
+# Node 0
+go run ./cmd/main.go --cmt-home ~/.cometbft-node0 --eth-client-url http://geth0:8551
+
+# Node 1
+go run ./cmd/main.go --cmt-home ~/.cometbft-node1 --eth-client-url http://geth1:8551
+
+# Node 2
+go run ./cmd/main.go --cmt-home ~/.cometbft-node2 --eth-client-url http://geth2:8551
+```
+
+CometBFT handles peer discovery, proposer rotation, and vote aggregation automatically. No changes to the ABCI application code are needed.
 
 ## What's Next
 
