@@ -276,7 +276,7 @@ func (app *GethConsensusApp) ProcessProposal(ctx context.Context,
 
 If validation fails, the validator returns `REJECT` and CometBFT counts it as a vote against the proposal. If >1/3 of validators reject, the round fails. CometBFT increments the round number, selects the next proposer via round-robin, and starts a new proposal with configurable timeouts (default 3s propose, 1s prevote/precommit).
 
-## FinalizeBlock — Executing with Instant Finality
+## FinalizeBlock
 
 Once >2/3 of validators prevote and precommit, CometBFT calls `FinalizeBlock` on every node. This is where the block actually gets executed on Geth:
 
@@ -344,7 +344,7 @@ func (app *GethConsensusApp) FinalizeBlock(ctx context.Context,
 
 The key line is `FinalizedBlockHash: payload.BlockHash`. In the Engine API, `FinalizedBlockHash` tells Geth that this block (and all ancestors) can never be reverted. On Ethereum mainnet, a block takes ~13 minutes to become finalized (2 epochs of Casper FFG). Here, every block is finalized the moment it's committed, because >2/3 of validators signed it and BFT guarantees they can't equivocate.
 
-## Commit — Acknowledging the Block
+## Commit
 
 CometBFT calls `Commit()` after `FinalizeBlock()` to persist application state. Since we already save the execution head to Badger in `FinalizeBlock`, there is nothing left to do here:
 
@@ -356,7 +356,7 @@ func (app *GethConsensusApp) Commit(ctx context.Context,
 }
 ```
 
-This completes the ABCI lifecycle for each block: `PrepareProposal` builds it, `ProcessProposal` validates it, `FinalizeBlock` executes it, and `Commit` acknowledges that the app has finished persisting state.
+With `Commit`, the ABCI lifecycle for a single block is complete. CometBFT increments the height and starts the next round.
 
 ## State Persistence
 
