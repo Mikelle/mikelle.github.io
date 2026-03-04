@@ -600,7 +600,7 @@ Collect the public keys from each node's `priv_validator_key.json` and build a s
 
 **3. Configure persistent peers:**
 
-Each node needs to know how to reach the others. In each node's `config.toml`, set `persistent_peers` to the other nodes' IDs and addresses. The node ID is the hex-encoded first 20 bytes of the node's public key, found in `config/node_key.json`:
+Each node needs to know how to reach the others. In each node's `config.toml`, set `persistent_peers` to the other nodes' IDs and addresses. The node ID is the first 20 bytes of the SHA256 hash of the node's public key, hex-encoded. You can find the public key in `config/node_key.json`:
 
 ```toml
 [p2p]
