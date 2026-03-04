@@ -15,36 +15,36 @@ In [Part 3](/blog/redis-distributed-consensus), we built a distributed consensus
 Each validator runs a CometBFT node paired with a Geth instance. CometBFT handles consensus (who proposes, who votes, when to finalize), while Geth handles execution (building blocks, running the EVM). They communicate through ABCI — the Application Blockchain Interface.
 
 ```text
-┌──────────────────────────────────────────────────────────┐
-│                   CometBFT Consensus                      │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐          │
-│  │ Validator 1│  │ Validator 2│  │ Validator 3│          │
-│  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘          │
-│        └───────────────┼───────────────┘                  │
-│                  P2P Gossip Network                        │
-└────────────────────────┼──────────────────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│                   CometBFT Consensus                    │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐        │
+│  │ Validator 1│  │ Validator 2│  │ Validator 3│        │
+│  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘        │
+│        └───────────────┼───────────────┘                │
+│                  P2P Gossip Network                      │
+└────────────────────────┼────────────────────────────────┘
                          │
                     ABCI (Local)
                          │
-┌────────────────────────▼──────────────────────────────────┐
-│                   ABCI Application                         │
-│  ┌──────────────────────────────────────────────────────┐ │
-│  │  GethConsensusApp                                     │ │
-│  │  ├─ PrepareProposal() → Build block via Engine API   │ │
-│  │  ├─ ProcessProposal() → Validate proposed block      │ │
-│  │  ├─ FinalizeBlock()   → Execute via NewPayload       │ │
-│  │  └─ Commit()          → Acknowledge block             │ │
-│  └──────────────────────────────────────────────────────┘ │
-│                         │                                  │
-│                Engine API (HTTP + JWT)                      │
-└─────────────────────────┼─────────────────────────────────┘
+┌────────────────────────▼────────────────────────────────┐
+│                   ABCI Application                      │
+│  ┌────────────────────────────────────────────────────┐ │
+│  │  GethConsensusApp                                  │ │
+│  │  ├─ PrepareProposal() → Build block via Engine API │ │
+│  │  ├─ ProcessProposal() → Validate proposed block    │ │
+│  │  ├─ FinalizeBlock()   → Execute via NewPayload     │ │
+│  │  └─ Commit()          → Acknowledge block          │ │
+│  └────────────────────────────────────────────────────┘ │
+│                         │                               │
+│                Engine API (HTTP + JWT)                   │
+└─────────────────────────┼───────────────────────────────┘
                           │
-┌─────────────────────────▼─────────────────────────────────┐
-│                        Geth                                │
-│  ├─ Block Builder       (Assembles transactions)          │
-│  ├─ State Machine       (Executes EVM)                    │
-│  └─ Storage             (Persists chain)                  │
-└───────────────────────────────────────────────────────────┘
+┌─────────────────────────▼───────────────────────────────┐
+│                        Geth                             │
+│  ├─ Block Builder       (Assembles transactions)       │
+│  ├─ State Machine       (Executes EVM)                 │
+│  └─ Storage             (Persists chain)               │
+└─────────────────────────────────────────────────────────┘
 ```
 
 This mirrors Ethereum's post-merge architecture: separate consensus and execution layers connected by the Engine API. The difference: CometBFT replaces the Beacon Chain, giving us BFT consensus with configurable validators.
