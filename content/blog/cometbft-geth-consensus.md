@@ -633,7 +633,7 @@ Over four parts we've gone from raw Engine API calls to a Byzantine-fault-tolera
 - **[Part 3](/blog/redis-distributed-consensus)**: Distributed with Redis leader election, PostgreSQL storage, member nodes
 - **Part 4**: BFT consensus with CometBFT voting, instant finality, multi-validator
 
-From here, CometBFT opens up several production extensions: **[vote extensions](https://docs.cometbft.com/v0.38/spec/abci/abci++_app_requirements#vote-extensions)** for embedding extra data in consensus votes (useful for preconfirmations), **[state sync](https://docs.cometbft.com/v0.38/core/state-sync)** for fast node bootstrapping, and **encrypted mempools** for MEV protection. The [mev-commit](https://github.com/primev/mev-commit) project builds on this pattern for its production consensus layer.
+From here, CometBFT opens up several extensions: **[vote extensions](https://docs.cometbft.com/v0.38/spec/abci/abci++_app_requirements#vote-extensions)** for embedding extra data in consensus votes and **[state sync](https://docs.cometbft.com/v0.38/core/state-sync)** for fast node bootstrapping.
 
 ---
 
