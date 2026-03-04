@@ -556,6 +556,17 @@ Each line of output traces the consensus flow: the proposer builds a block (`Pre
 
 The above runs a single validator. To test BFT consensus, you need at least four validators (tolerating one Byzantine fault, since n >= 3f+1). Each validator gets its own CometBFT home directory, its own Geth instance, and a shared genesis that lists all validator public keys.
 
+**0. Start four Geth instances:**
+
+The single-validator setup uses `docker compose up -d geth` from the repo root, which starts one Geth instance. For four validators, use the multi-node compose file in `04-cometbft-consensus/`:
+
+```bash
+cd 04-cometbft-consensus
+docker compose -f docker-compose.multi.yml up -d
+```
+
+This starts four isolated Geth containers on separate Engine API ports (8551, 8552, 8553, 8554).
+
 **1. Generate validator keys:**
 
 ```bash
@@ -614,20 +625,20 @@ persistent_peers = "node0_id@node0_host:26656,node1_id@node1_host:26656,node2_id
 
 **4. Start all nodes:**
 
-Each validator runs its own `cometbft-geth` process paired with a dedicated Geth instance on separate Engine API ports:
+Each validator runs its own `cometbft-geth` process paired with a dedicated Geth instance. The Engine API ports match `docker-compose.multi.yml` (8551, 8552, 8553, 8554):
 
 ```bash
 # Node 0
-go run ./cmd/main.go --cmt-home ~/.cometbft-node0 --eth-client-url http://geth0:8551
+go run ./cmd/main.go --cmt-home ~/.cometbft-node0 --eth-client-url http://localhost:8551
 
 # Node 1
-go run ./cmd/main.go --cmt-home ~/.cometbft-node1 --eth-client-url http://geth1:8551
+go run ./cmd/main.go --cmt-home ~/.cometbft-node1 --eth-client-url http://localhost:8552
 
 # Node 2
-go run ./cmd/main.go --cmt-home ~/.cometbft-node2 --eth-client-url http://geth2:8551
+go run ./cmd/main.go --cmt-home ~/.cometbft-node2 --eth-client-url http://localhost:8553
 
 # Node 3
-go run ./cmd/main.go --cmt-home ~/.cometbft-node3 --eth-client-url http://geth3:8551
+go run ./cmd/main.go --cmt-home ~/.cometbft-node3 --eth-client-url http://localhost:8554
 ```
 
 CometBFT handles peer discovery, proposer rotation, and vote aggregation automatically. No changes to the ABCI application code are needed.
