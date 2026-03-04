@@ -1,7 +1,7 @@
 ---
 title: "CometBFT Integration: BFT Finality for Geth"
-date: 2026-02-10
-draft: true
+date: 2026-03-04
+draft: false
 description: "Replacing custom leader election with CometBFT for Byzantine fault tolerance, multi-validator voting, and instant finality."
 tags: ["consensus", "geth", "cometbft", "tutorial"]
 ---
