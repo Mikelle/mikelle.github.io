@@ -637,4 +637,4 @@ From here, CometBFT opens up several extensions: **[vote extensions](https://doc
 
 ---
 
-*Full source code: [geth-consensus-tutorial](https://github.com/mikelle/geth-consensus-tutorial/tree/main/04-cometbft-consensus) | Based on [mev-commit consensus layer](https://github.com/primev/mev-commit/tree/main/cl)*
+*Full source code: [geth-consensus-tutorial](https://github.com/mikelle/geth-consensus-tutorial/tree/main/04-cometbft-consensus)*
