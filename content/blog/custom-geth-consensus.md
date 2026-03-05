@@ -24,11 +24,11 @@ The [mev-commit](https://github.com/primev/mev-commit) project uses custom conse
 
 ```text
 ┌─────────────────────────────────────────────────┐
-│              Your Application                    │
+│              Your Application                   │
 └─────────────────────┬───────────────────────────┘
                       │
 ┌─────────────────────▼───────────────────────────┐
-│            Custom Consensus Layer                │
+│            Custom Consensus Layer               │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────┐  │
 │  │ Engine API  │  │    State    │  │  Block  │  │
 │  │   Client    │  │   Manager   │  │ Builder │  │
@@ -36,7 +36,7 @@ The [mev-commit](https://github.com/primev/mev-commit) project uses custom conse
 └─────────────────────┬───────────────────────────┘
                       │ Engine API (HTTP + JWT)
 ┌─────────────────────▼───────────────────────────┐
-│                    Geth                          │
+│                    Geth                         │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -321,11 +321,11 @@ type BlockBuildState struct {
 State machine:
 
 ```text
-┌──────────────┐  GetPayload()  ┌─────────────────┐
-│ StepBuildBlock │ ────────────► │ StepFinalizeBlock │
-└──────────────┘                └─────────────────┘
-        ▲                                │
-        └────────────────────────────────┘
+┌────────────────┐ GetPayload()  ┌───────────────────┐
+│ StepBuildBlock │ ────────────> │ StepFinalizeBlock │
+└────────────────┘               └───────────────────┘
+        ▲                                   │
+        └───────────────────────────────────┘
                   FinalizeBlock()
 ```
 

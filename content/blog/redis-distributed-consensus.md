@@ -14,10 +14,10 @@ In [Part 2](/blog/single-node-consensus), we built a production-ready single-nod
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
-│                       Leader Node                            │
-│  ┌─────────────┐   ┌────────────┐   ┌───────────────────┐  │
+│                       Leader Node                           │
+│  ┌──────────────┐   ┌────────────┐   ┌───────────────────┐  │
 │  │ BlockBuilder │   │ PostgreSQL │   │ HTTP API (:8090)  │  │
-│  │   + Geth     │──►│  payloads  │◄──│ /blocks?after=N   │  │
+│  │   + Geth     │-->│  payloads  │<--│ /blocks?after=N   │  │
 │  └──────┬───────┘   └────────────┘   └───────────────────┘  │
 │         │                                      ▲            │
 │  ┌──────▼───────┐                              │            │
