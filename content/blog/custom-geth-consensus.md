@@ -213,7 +213,7 @@ type ExecutionHead struct {
     BlockTime   uint64
 }
 
-func (bb *BlockBuilder) GetPayload(ctx context.Context) (*engine.ExecutableData, error) {
+func (bb *BlockBuilder) GetPayload(ctx context.Context) (*engine.ExecutableData, []hexutil.Bytes, error) {
     timestamp := uint64(time.Now().Unix())
     if timestamp <= bb.executionHead.BlockTime {
         timestamp = bb.executionHead.BlockTime + 1
@@ -248,14 +248,21 @@ func (bb *BlockBuilder) GetPayload(ctx context.Context) (*engine.ExecutableData,
 
     // Retrieve built block
     payloadResp, _ := bb.engineCl.GetPayloadV5(ctx, *payloadID)
-    return payloadResp.ExecutionPayload, nil
+
+    // Convert execution requests for NewPayloadV4
+    requests := make([]hexutil.Bytes, len(payloadResp.Requests))
+    for i, r := range payloadResp.Requests {
+        requests[i] = r
+    }
+    return payloadResp.ExecutionPayload, requests, nil
 }
 ```
 
 Finalization:
 
 ```go
-func (bb *BlockBuilder) FinalizeBlock(ctx context.Context, payload *engine.ExecutableData) error {
+func (bb *BlockBuilder) FinalizeBlock(ctx context.Context,
+    payload *engine.ExecutableData, requests []hexutil.Bytes) error {
     // Validate
     if payload.Number != bb.executionHead.BlockHeight+1 {
         return fmt.Errorf("invalid height")
