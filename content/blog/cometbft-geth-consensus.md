@@ -17,11 +17,11 @@ Each validator runs a CometBFT node paired with a Geth instance. CometBFT handle
 ```text
 ┌─────────────────────────────────────────────────────────┐
 │                   CometBFT Consensus                    │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐        │
-│  │ Validator 1│  │ Validator 2│  │ Validator 3│        │
-│  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘        │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐         │
+│  │ Validator 1│  │ Validator 2│  │ Validator 3│         │
+│  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘         │
 │        └───────────────┼───────────────┘                │
-│                  P2P Gossip Network                      │
+│                  P2P Gossip Network                     │
 └────────────────────────┼────────────────────────────────┘
                          │
                     ABCI (Local)
@@ -36,14 +36,14 @@ Each validator runs a CometBFT node paired with a Geth instance. CometBFT handle
 │  │  └─ Commit()          → Acknowledge block          │ │
 │  └────────────────────────────────────────────────────┘ │
 │                         │                               │
-│                Engine API (HTTP + JWT)                   │
+│                Engine API (HTTP + JWT)                  │
 └─────────────────────────┼───────────────────────────────┘
                           │
 ┌─────────────────────────▼───────────────────────────────┐
 │                        Geth                             │
-│  ├─ Block Builder       (Assembles transactions)       │
-│  ├─ State Machine       (Executes EVM)                 │
-│  └─ Storage             (Persists chain)               │
+│  ├─ Block Builder       (Assembles transactions)        │
+│  ├─ State Machine       (Executes EVM)                  │
+│  └─ Storage             (Persists chain)                │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -66,39 +66,39 @@ CometBFT uses a three-phase commit protocol. A designated proposer builds a bloc
 Height H
     │
     ▼
-┌──────────────────────────────────────────────┐
+┌───────────────────────────────────────────────┐
 │  PROPOSE                                      │
 │  Proposer calls PrepareProposal()             │
 │    1. ForkchoiceUpdatedV3 (start building)    │
 │    2. Wait 300ms for transactions             │
 │    3. GetPayloadV5 (retrieve built block)     │
 │    4. Wrap payload as CometBFT transaction    │
-└──────────────────────┬───────────────────────┘
+└──────────────────────┬────────────────────────┘
                        ▼
-┌──────────────────────────────────────────────┐
+┌───────────────────────────────────────────────┐
 │  PREVOTE                                      │
 │  All validators call ProcessProposal()        │
 │    • Verify parent hash matches local head    │
 │    • Verify block height is sequential        │
 │    • Verify timestamp is increasing           │
 │    • Vote ACCEPT or REJECT                    │
-└──────────────────────┬───────────────────────┘
+└──────────────────────┬────────────────────────┘
                        ▼
-┌──────────────────────────────────────────────┐
+┌───────────────────────────────────────────────┐
 │  PRECOMMIT                                    │
 │  Validators commit if >2/3 prevoted           │
 │    • Sign precommit message                   │
 │    • Broadcast to network                     │
-└──────────────────────┬───────────────────────┘
+└──────────────────────┬────────────────────────┘
                        ▼
-┌──────────────────────────────────────────────┐
+┌───────────────────────────────────────────────┐
 │  FINALIZATION                                 │
 │  All nodes call FinalizeBlock()               │
 │    1. NewPayloadV4 (submit to Geth)           │
 │    2. ForkchoiceUpdatedV3 (set as head)       │
 │    3. Save execution head to Badger DB        │
 │    4. Block is FINAL — no reorgs possible     │
-└──────────────────────┬───────────────────────┘
+└──────────────────────┬────────────────────────┘
                        ▼
                    Height H+1
 ```
