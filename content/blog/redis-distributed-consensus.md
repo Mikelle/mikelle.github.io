@@ -8,7 +8,7 @@ tags: ["consensus", "geth", "mev", "redis", "postgres", "tutorial"]
 
 *Part 3 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
 
-In [Part 2](/blog/single-node-consensus), we built a production-ready single-node consensus layer. But a single node is a single point of failure. This article adds Redis-based leader election for failover, PostgreSQL for durable payload storage, and member nodes that sync blocks from the leader and execute them on their own Geth instance, making each member a full execution replica. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/03-member-nodes).
+A single-node consensus layer ([Part 2](/blog/single-node-consensus)) works until the node dies. This article adds Redis-based leader election for failover, PostgreSQL for durable payload storage, and member nodes that sync blocks from the leader and execute them on their own Geth instance, making each member a full execution replica. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/03-member-nodes).
 
 ## What We're Building
 

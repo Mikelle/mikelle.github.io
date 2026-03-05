@@ -8,7 +8,7 @@ tags: ["consensus", "geth", "cometbft", "tutorial"]
 
 *Part 4 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
 
-In [Part 3](/blog/redis-distributed-consensus), we built a distributed consensus system with Redis leader election and member nodes. That system tolerates crashes: if the leader dies, a standby takes over. But it can't handle a *malicious* leader that proposes invalid blocks. This article replaces the entire custom stack with [CometBFT](https://cometbft.com/) (formerly Tendermint), giving us Byzantine fault tolerance, multi-validator voting, and instant finality. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/04-cometbft-consensus).
+The Redis-based system from [Part 3](/blog/redis-distributed-consensus) tolerates crashes: if the leader dies, a standby takes over. But it can't handle a *malicious* leader that proposes invalid blocks. This article replaces the entire custom stack with [CometBFT](https://cometbft.com/) (formerly Tendermint), giving us Byzantine fault tolerance, multi-validator voting, and instant finality. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/04-cometbft-consensus).
 
 ## What We're Building
 
@@ -650,14 +650,7 @@ CometBFT handles peer discovery, proposer rotation, and vote aggregation automat
 
 ## What's Next
 
-Over four parts we've gone from raw Engine API calls to a Byzantine-fault-tolerant consensus layer:
-
-- **[Part 1](/blog/custom-geth-consensus)**: Engine API fundamentals (ForkchoiceUpdated, GetPayload, NewPayload)
-- **[Part 2](/blog/single-node-consensus)**: Production single-node with retry logic, health checks, graceful shutdown
-- **[Part 3](/blog/redis-distributed-consensus)**: Distributed with Redis leader election, PostgreSQL storage, member nodes
-- **Part 4**: BFT consensus with CometBFT voting, instant finality, multi-validator
-
-From here, CometBFT opens up several extensions: **[vote extensions](https://docs.cometbft.com/v0.38/spec/abci/abci++_app_requirements#vote-extensions)** for embedding extra data in consensus votes and **[state sync](https://docs.cometbft.com/v0.38/core/state-sync)** for fast node bootstrapping.
+CometBFT opens up several extensions from here: **[vote extensions](https://docs.cometbft.com/v0.38/spec/abci/abci++_app_requirements#vote-extensions)** for embedding extra data in consensus votes and **[state sync](https://docs.cometbft.com/v0.38/core/state-sync)** for fast node bootstrapping.
 
 ---
 

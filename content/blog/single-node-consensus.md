@@ -8,7 +8,7 @@ tags: ["consensus", "geth", "mev", "tutorial"]
 
 *Part 2 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
 
-In [Part 1](/blog/custom-geth-consensus), we covered the Engine API fundamentals — how to authenticate with Geth, trigger block building, and finalize blocks. Now we'll wrap those same calls into a production-ready application with retry logic, health checks, and graceful shutdown. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/02-single-node).
+[Part 1](/blog/custom-geth-consensus) left us with raw Engine API calls that build and finalize a single block. This part wraps those calls into a production-ready application with retry logic, health checks, and graceful shutdown. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/02-single-node).
 
 ## What We're Building
 
