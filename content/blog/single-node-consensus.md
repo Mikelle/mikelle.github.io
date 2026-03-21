@@ -3,7 +3,7 @@ title: "Single Node Consensus: Building a Complete Implementation"
 date: 2026-02-08
 draft: false
 description: "Building a production-ready single-node consensus layer with retry logic, health checks, graceful shutdown, and metrics."
-tags: ["consensus", "geth", "mev", "tutorial"]
+tags: ["consensus", "geth", "tutorial"]
 ---
 
 *Part 2 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->

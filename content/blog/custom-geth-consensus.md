@@ -3,7 +3,7 @@ title: "Writing Custom Consensus for Geth: A Practical Guide"
 date: 2026-02-07
 draft: false
 description: "How to build a custom consensus layer for Geth using the Engine API - the foundation for L2 sequencers and private chains."
-tags: ["consensus", "geth", "mev", "tutorial"]
+tags: ["consensus", "geth", "tutorial"]
 ---
 
 *Part 1 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
