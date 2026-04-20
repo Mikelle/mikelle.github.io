@@ -36,7 +36,7 @@ A single-node consensus layer ([Part 2](/blog/single-node-consensus)) works unti
             └─────────────┘               └─────────────┘       └─────────────┘
 ```
 
-The **leader** builds blocks on Geth, stores payloads in PostgreSQL, and exposes an HTTP API. **Member nodes** poll that API, execute each block on their own Geth via the Engine API, and store the results in their local PostgreSQL — making each member a full execution replica that can serve RPC queries (eth_call, eth_getBalance, etc.) without touching the leader.
+The **leader** builds blocks on Geth, stores payloads in PostgreSQL, and exposes an HTTP API. **Member nodes** poll that API, execute each block on their own Geth via the Engine API, and store the results in their local PostgreSQL, making each member a full execution replica that can serve RPC queries (eth_call, eth_getBalance, etc.) without touching the leader.
 
 Since NewPayloadV4 requires both the execution payload and [EIP-7685](https://eips.ethereum.org/EIPS/eip-7685) execution requests to execute a block, we store both in PostgreSQL so members can replay them.
 
@@ -88,7 +88,7 @@ return 0`)
 }
 ```
 
-`DelIfValue` follows the same pattern — only delete if the key still holds our value. See the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/03-member-nodes/pkg/redis/client.go).
+`DelIfValue` follows the same pattern: only delete if the key still holds our value. See the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/03-member-nodes/pkg/redis/client.go).
 
 ## Leader Election
 
@@ -178,7 +178,7 @@ func (le *LeaderElection) Stop() {
 
 ## Redis State Manager
 
-Same `StateManager` interface from [Part 2](/blog/single-node-consensus) — the implementation changes from in-memory to Redis-backed with JSON serialization and a 5-minute TTL:
+Same `StateManager` interface from [Part 2](/blog/single-node-consensus), but the implementation changes from in-memory to Redis-backed with JSON serialization and a 5-minute TTL:
 
 ```go
 type RedisStateManager struct {
@@ -237,7 +237,7 @@ func (s *PayloadStore) migrate(ctx context.Context) error {
 
 The `requests_data` column stores the base64-encoded execution requests alongside each payload. The `ALTER TABLE` handles upgrades from the previous schema.
 
-The store uses [`pgx`](https://github.com/jackc/pgx) with connection pooling and provides `SavePayload`, `GetPayloadByNumber`, `GetPayloadByHash`, `GetLatestPayload`, and `GetPayloadsAfter` — see the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/03-member-nodes/pkg/postgres/store.go).
+The store uses [`pgx`](https://github.com/jackc/pgx) with connection pooling and provides `SavePayload`, `GetPayloadByNumber`, `GetPayloadByHash`, `GetLatestPayload`, and `GetPayloadsAfter`. See the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/03-member-nodes/pkg/postgres/store.go).
 
 The key query for member sync is batch fetching by block number:
 
@@ -257,7 +257,7 @@ func (s *PayloadStore) GetPayloadsAfter(ctx context.Context, afterNumber uint64,
 
 ## Block Builder Changes
 
-The block builder is the same as [Part 2](/blog/single-node-consensus), with two additions after finalization — store in PostgreSQL and publish to Redis:
+The block builder is the same as [Part 2](/blog/single-node-consensus), with two additions after finalization: store in PostgreSQL and publish to Redis.
 
 ```go
 // Update local head (block is finalized on Geth regardless of storage outcome)
@@ -350,7 +350,7 @@ type ExecutionEngine interface {
 }
 ```
 
-For each fetched block, `executeBlock` deserializes the payload and requests, then replays the same Engine API calls the leader made — `NewPayloadV4` to push the block, `ForkchoiceUpdatedV3` to set the head:
+For each fetched block, `executeBlock` deserializes the payload and requests, then replays the same Engine API calls the leader made: `NewPayloadV4` to push the block, `ForkchoiceUpdatedV3` to set the head.
 
 ```go
 func (s *Syncer) executeBlock(ctx context.Context, block *BlockResponse) error {
@@ -404,7 +404,7 @@ func (s *Syncer) executeBlock(ctx context.Context, block *BlockResponse) error {
 }
 ```
 
-After execution, the block is saved to the member's local PostgreSQL. On startup, the syncer queries Geth for its current head block and resumes from there — so restarts don't re-execute the entire chain. See the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/03-member-nodes/pkg/sync/syncer.go) for the complete sync loop.
+After execution, the block is saved to the member's local PostgreSQL. On startup, the syncer queries Geth for its current head block and resumes from there, so restarts don't re-execute the entire chain. See the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/03-member-nodes/pkg/sync/syncer.go) for the complete sync loop.
 
 ## Application Wiring
 
@@ -537,7 +537,7 @@ curl localhost:8081/health  # OK (mode=member, lastSynced=1, totalSynced=1)
 
 ## What's Next
 
-We now have a distributed consensus system with leader election, durable storage, and horizontally scalable member nodes that are full execution replicas. In **[Part 4: CometBFT Integration](/blog/cometbft-geth-consensus)**, we replace the custom leader election with proper BFT consensus — multiple validators that agree on blocks through voting rounds, with instant finality.
+We now have a distributed consensus system with leader election, durable storage, and horizontally scalable member nodes that are full execution replicas. In **[Part 4: CometBFT Integration](/blog/cometbft-geth-consensus)**, we replace the custom leader election with proper BFT consensus, where multiple validators agree on blocks through voting rounds, with instant finality.
 
 ---
 

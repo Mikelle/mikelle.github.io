@@ -58,7 +58,7 @@ cd geth-consensus-tutorial
 docker compose up geth
 ```
 
-This starts Geth with the Engine API on port 8551 and HTTP RPC on 8545. The setup uses a custom [`genesis.json`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/genesis.json) for the private chain — see [`docker-compose.yml`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/docker-compose.yml) and [`geth-entrypoint.sh`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/geth-entrypoint.sh) for the full configuration.
+This starts Geth with the Engine API on port 8551 and HTTP RPC on 8545. The setup uses a custom [`genesis.json`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/genesis.json) for the private chain. See [`docker-compose.yml`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/docker-compose.yml) and [`geth-entrypoint.sh`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/geth-entrypoint.sh) for the full configuration.
 
 One important flag: `--miner.gasprice 1`. Geth's miner filters transactions whose effective tip is below this threshold during block building. The default (1 Mwei) silently drops transactions with low priority fees. This is a common gotcha on private chains where tools like `cast` default to minimal fees.
 
@@ -123,7 +123,7 @@ func LoadJWTHexFile(file string) ([]byte, error) {
 }
 ```
 
-> Error handling is shown in full above. Remaining code samples omit it for brevity — see the [repo](https://github.com/mikelle/geth-consensus-tutorial/tree/main/01-engine-api) for complete implementations.
+> Error handling is shown in full above. Remaining code samples omit it for brevity. See the [repo](https://github.com/mikelle/geth-consensus-tutorial/tree/main/01-engine-api) for complete implementations.
 
 ## Engine Client
 
@@ -235,7 +235,7 @@ func (bb *BlockBuilder) GetPayload(ctx context.Context) (*engine.ExecutableData,
         BeaconRoot:            &headHash,
         Withdrawals:           []*types.Withdrawal{},
         // Random is the RANDAO mix from PoS. Not meaningful for custom
-        // consensus, but the field is required — any deterministic value works.
+        // consensus, but the field is required, so any deterministic value works.
         Random: headHash,
     }
 

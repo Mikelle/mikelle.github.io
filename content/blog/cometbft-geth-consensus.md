@@ -12,7 +12,7 @@ The Redis-based system from [Part 3](/blog/redis-distributed-consensus) tolerate
 
 ## What We're Building
 
-Each validator runs a CometBFT node paired with a Geth instance. CometBFT handles consensus (who proposes, who votes, when to finalize), while Geth handles execution (building blocks, running the EVM). They communicate through ABCI — the Application Blockchain Interface.
+Each validator runs a CometBFT node paired with a Geth instance. CometBFT handles consensus (who proposes, who votes, when to finalize), while Geth handles execution (building blocks, running the EVM). They communicate through ABCI, the Application Blockchain Interface.
 
 ```text
 ┌─────────────────────────────────────────────────────────┐
@@ -97,7 +97,7 @@ Height H
 │    1. NewPayloadV4 (submit to Geth)           │
 │    2. ForkchoiceUpdatedV3 (set as head)       │
 │    3. Save execution head to Badger DB        │
-│    4. Block is FINAL — no reorgs possible     │
+│    4. Block is FINAL, no reorgs possible      │
 └──────────────────────┬────────────────────────┘
                        ▼
                    Height H+1
@@ -148,7 +148,7 @@ type GethConsensusApp struct {
 }
 ```
 
-## PrepareProposal — Building Blocks
+## PrepareProposal: Building Blocks
 
 When CometBFT selects this node as the round's proposer, it calls `PrepareProposal`. We trigger Geth to build a block via `ForkchoiceUpdatedV3` with payload attributes, wait for transactions to be included, then retrieve the built payload with `GetPayloadV5`:
 
@@ -217,7 +217,7 @@ func (app *GethConsensusApp) PrepareProposal(ctx context.Context,
 }
 ```
 
-## ProcessProposal — Validating Blocks
+## ProcessProposal: Validating Blocks
 
 Every validator receives the proposal and calls `ProcessProposal`. This is where non-proposing validators decide whether to vote ACCEPT or REJECT. The validation checks that the proposed block builds correctly on top of the current chain head:
 
@@ -308,7 +308,7 @@ func (app *GethConsensusApp) FinalizeBlock(ctx context.Context,
         return nil, fmt.Errorf("payload invalid: %s", errMsg)
     }
 
-    // Update forkchoice — instant finality
+    // Update forkchoice for instant finality
     fcs := engine.ForkchoiceStateV1{
         HeadBlockHash:      payload.BlockHash,
         SafeBlockHash:      payload.BlockHash,
@@ -436,7 +436,7 @@ func (app *GethConsensusApp) saveExecutionHead(head *ExecutionHead) error {
 
 ## Application Wiring
 
-The `runNode()` function wires everything together — Engine API client, Badger DB, ABCI app, and CometBFT node. The `engineClientAdapter` bridges our concrete `ethclient.EngineClient` to the `app.EngineClient` interface, keeping the ABCI app testable without a real Geth connection:
+The `runNode()` function wires everything together: Engine API client, Badger DB, ABCI app, and CometBFT node. The `engineClientAdapter` bridges our concrete `ethclient.EngineClient` to the `app.EngineClient` interface, keeping the ABCI app testable without a real Geth connection:
 
 ```go
 func runNode(c *cli.Context) error {

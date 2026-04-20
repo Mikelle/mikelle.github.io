@@ -91,7 +91,7 @@ type StateManager interface {
 }
 ```
 
-The `StateManager` interface is designed to be swappable. For single-node, `LocalStateManager` is a trivial in-memory implementation — see the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/02-single-node/pkg/state/state.go). [Part 3](/blog/redis-distributed-consensus) will replace it with Redis-backed state.
+The `StateManager` interface is designed to be swappable. For single-node, `LocalStateManager` is a trivial in-memory implementation. See the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/02-single-node/pkg/state/state.go). [Part 3](/blog/redis-distributed-consensus) will replace it with Redis-backed state.
 
 ## Retry Logic with Exponential Backoff
 
@@ -144,7 +144,7 @@ var ErrEmptyBlock = errors.New("empty block skipped")
 
 `GetPayload` triggers block assembly and saves the result to state. On startup (or restart), it queries Geth for the current chain head via `SetExecutionHeadFromRPC` so it knows where to build from.
 
-When there are no pending transactions, Geth returns an empty block. Rather than finalizing it, we return `ErrEmptyBlock` and wait for `buildEmptyBlocksDelay` before trying again — this avoids spamming the chain with empty blocks.
+When there are no pending transactions, Geth returns an empty block. Rather than finalizing it, we return `ErrEmptyBlock` and wait for `buildEmptyBlocksDelay` before trying again. This avoids spamming the chain with empty blocks.
 
 ```go
 func (bb *BlockBuilder) GetPayload(ctx context.Context) error {
@@ -181,7 +181,7 @@ func (bb *BlockBuilder) GetPayload(ctx context.Context) error {
 
         response, err := bb.engineCl.ForkchoiceUpdatedV3(ctx, fcs, attrs)
         if err != nil {
-            return err // Transient — will retry
+            return err // Transient, will retry
         }
         if response.PayloadStatus.Status != engine.VALID {
             return backoff.Permanent(fmt.Errorf("invalid status: %s",
@@ -497,7 +497,7 @@ func (app *SingleNodeApp) Stop() {
 
 ## CLI Entry Point
 
-The CLI uses [`urfave/cli`](https://github.com/urfave/cli) to map flags to the `Config` struct, sets up signal handling for graceful shutdown, and wires everything together. See the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/02-single-node/cmd/main.go) — here's the core:
+The CLI uses [`urfave/cli`](https://github.com/urfave/cli) to map flags to the `Config` struct, sets up signal handling for graceful shutdown, and wires everything together. See the [full source](https://github.com/mikelle/geth-consensus-tutorial/blob/main/02-single-node/cmd/main.go). Here's the core:
 
 ```go
 ctx, cancel := signal.NotifyContext(context.Background(),
