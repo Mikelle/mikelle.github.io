@@ -32,8 +32,8 @@ The application has four main components:
 │  └──────┬───────┘ └──────┬───────┘ └──────────────┘  │
 │         │                │                           │
 │  ┌──────▼────────────────▼──────────────────────┐    │
-│  │              Run Loop                         │   │
-│  │  GetPayload --> Read State --> FinalizeBlock  │   │
+│  │              Run Loop                        │    │
+│  │  GetPayload --> Read State --> FinalizeBlock │    │
 │  └──────────────────────────────────────────────┘    │
 └──────────────────────────────────────────────────────┘
 ```
