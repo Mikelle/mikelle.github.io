@@ -24,20 +24,20 @@ The [mev-commit](https://github.com/primev/mev-commit) project uses custom conse
 
 ```goat
 +-------------------------------------------------+
-|               Your Application                  |
+|                Your Application                 |
 +-------------------------------------------------+
-                       |
-                       v
+                         |
+                         v
 +-------------------------------------------------+
-|              Custom Consensus Layer             |
-|  +-------------+  +-------------+  +---------+   |
-|  | Engine API  |  |    State    |  |  Block  |   |
-|  |   Client    |  |   Manager   |  | Builder |   |
-|  +-------------+  +-------------+  +---------+   |
+|             Custom Consensus Layer              |
+|  +-------------+ +-------------+ +-----------+  |
+|  | Engine API  | |    State    | |   Block   |  |
+|  |   Client    | |   Manager   | |  Builder  |  |
+|  +-------------+ +-------------+ +-----------+  |
 +-------------------------------------------------+
-                       |
-                       |  Engine API (HTTP + JWT)
-                       v
+                         |
+                         |  Engine API (HTTP + JWT)
+                         v
 +-------------------------------------------------+
 |                      Geth                       |
 +-------------------------------------------------+
