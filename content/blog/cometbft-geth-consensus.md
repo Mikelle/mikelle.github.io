@@ -30,10 +30,10 @@ Each validator runs a CometBFT node paired with a Geth instance. CometBFT handle
 |                    ABCI Application                        |
 |                                                            |
 |   GethConsensusApp                                         |
-|     PrepareProposal()  ->  Build block via Engine API      |
-|     ProcessProposal()  ->  Validate proposed block         |
-|     FinalizeBlock()    ->  Execute via NewPayload          |
-|     Commit()           ->  Acknowledge block               |
+|     PrepareProposal()  -->  Build block via Engine API     |
+|     ProcessProposal()  -->  Validate proposed block        |
+|     FinalizeBlock()    -->  Execute via NewPayload         |
+|     Commit()           -->  Acknowledge block              |
 +------------------------------------------------------------+
                               |
                               |  Engine API (HTTP + JWT)

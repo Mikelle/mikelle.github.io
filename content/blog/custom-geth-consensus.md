@@ -197,7 +197,7 @@ Building a block is two-phase:
         v
 +-----------------------------------+
 | 3. GetPayloadV5                   |
-|    -> ExecutionPayload            |
+|    --> ExecutionPayload           |
 +-----------------------------------+
 ```
 
@@ -212,14 +212,14 @@ Building a block is two-phase:
         v
 +-----------------------------------+
 | 5. NewPayloadV4                   |
-|    -> VALID / INVALID / SYNCING   |
+|    --> VALID / INVALID / SYNCING  |
 +-----------------------------------+
         |
         | Geth executes block
         v
 +-----------------------------------+
 | 6. ForkchoiceUpdatedV3            |
-|    -> block becomes canonical     |
+|    --> block becomes canonical    |
 +-----------------------------------+
 ```
 
