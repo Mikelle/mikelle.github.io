@@ -22,22 +22,25 @@ The [mev-commit](https://github.com/primev/mev-commit) project uses custom conse
 
 ## Architecture Overview
 
-```text
-┌─────────────────────────────────────────────────┐
-│              Your Application                   │
-└─────────────────────┬───────────────────────────┘
-                      │
-┌─────────────────────▼───────────────────────────┐
-│            Custom Consensus Layer               │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────┐  │
-│  │ Engine API  │  │    State    │  │  Block  │  │
-│  │   Client    │  │   Manager   │  │ Builder │  │
-│  └─────────────┘  └─────────────┘  └─────────┘  │
-└─────────────────────┬───────────────────────────┘
-                      │ Engine API (HTTP + JWT)
-┌─────────────────────▼───────────────────────────┐
-│                    Geth                         │
-└─────────────────────────────────────────────────┘
+```goat
++-------------------------------------------------+
+|               Your Application                  |
++-------------------------------------------------+
+                       |
+                       v
++-------------------------------------------------+
+|              Custom Consensus Layer             |
+|  +-------------+  +-------------+  +---------+   |
+|  | Engine API  |  |    State    |  |  Block  |   |
+|  |   Client    |  |   Manager   |  | Builder |   |
+|  +-------------+  +-------------+  +---------+   |
++-------------------------------------------------+
+                       |
+                       |  Engine API (HTTP + JWT)
+                       v
++-------------------------------------------------+
+|                      Geth                       |
++-------------------------------------------------+
 ```
 
 The Engine API uses HTTP with JWT authentication. Three primary methods:
@@ -178,30 +181,46 @@ Building a block is two-phase:
 
 ### Phase 1: Propose
 
-```text
-1. ForkchoiceUpdatedV3 with PayloadAttributes
-   → Geth starts assembling block
-   → Returns PayloadID
-
-2. Wait for build delay (~100ms)
-   → Geth includes transactions
-
-3. GetPayloadV5 with PayloadID
-   → Returns ExecutionPayload
+```goat
++-----------------------------------+
+| 1. ForkchoiceUpdatedV3            |
+|    with PayloadAttributes         |
++-----------------------------------+
+        |
+        | Geth starts assembling, returns PayloadID
+        v
++-----------------------------------+
+| 2. Wait for build delay (~100ms)  |
++-----------------------------------+
+        |
+        | Geth includes transactions
+        v
++-----------------------------------+
+| 3. GetPayloadV5                   |
+|    -> ExecutionPayload            |
++-----------------------------------+
 ```
 
 ### Phase 2: Finalize
 
-```text
-4. Validate ExecutionPayload
-   → Check height, parent hash, timestamp
-
-5. NewPayloadV4 with ExecutionPayload
-   → Geth executes block
-   → Returns VALID/INVALID/SYNCING
-
-6. ForkchoiceUpdatedV3 to set new head
-   → Block becomes canonical
+```goat
++-----------------------------------+
+| 4. Validate ExecutionPayload      |
+|    height, parent, timestamp      |
++-----------------------------------+
+        |
+        v
++-----------------------------------+
+| 5. NewPayloadV4                   |
+|    -> VALID / INVALID / SYNCING   |
++-----------------------------------+
+        |
+        | Geth executes block
+        v
++-----------------------------------+
+| 6. ForkchoiceUpdatedV3            |
+|    -> block becomes canonical     |
++-----------------------------------+
 ```
 
 Implementation:
@@ -327,13 +346,17 @@ type BlockBuildState struct {
 
 State machine:
 
-```text
-┌────────────────┐ GetPayload()  ┌───────────────────┐
-│ StepBuildBlock │ ────────────> │ StepFinalizeBlock │
-└────────────────┘               └───────────────────┘
-        ▲                                   │
-        └───────────────────────────────────┘
-                  FinalizeBlock()
+```goat
++----------------+
+| StepBuildBlock |
++----------------+
+    |              ^
+    | GetPayload() |
+    |              | FinalizeBlock()
+    v              |
++-------------------+
+| StepFinalizeBlock |
++-------------------+
 ```
 
 ## What's Next

@@ -12,28 +12,33 @@ A single-node consensus layer ([Part 2](/blog/single-node-consensus)) works unti
 
 ## What We're Building
 
-```text
-┌─────────────────────────────────────────────────────────────┐
-│                       Leader Node                           │
-│  ┌──────────────┐   ┌────────────┐   ┌───────────────────┐  │
-│  │ BlockBuilder │   │ PostgreSQL │   │ HTTP API (:8090)  │  │
-│  │   + Geth     │-->│  payloads  │<--│ /blocks?after=N   │  │
-│  └──────┬───────┘   └────────────┘   └───────────────────┘  │
-│         │                                      ▲            │
-│  ┌──────▼───────┐                              │            │
-│  │    Redis     │                              │            │
-│  │  • Election  │                              │            │
-│  │  • State     │                              │            │
-│  └──────────────┘                              │            │
-└────────────────────────────────────────────────┼────────────┘
-                                                 │
-                   ┌─────────────────────────────┼─────────────────────┐
-                   │                             │                     │
-            ┌──────▼──────┐               ┌──────▼──────┐       ┌──────▼──────┐
-            │  Member 1   │               │  Member 2   │       │  Member 3   │
-            │ Syncer+Geth │               │ Syncer+Geth │       │ Syncer+Geth │
-            │ +PostgreSQL │               │ +PostgreSQL │       │ +PostgreSQL │
-            └─────────────┘               └─────────────┘       └─────────────┘
+```goat
++----------------------------------------------------------------+
+|                           Leader Node                          |
+|                                                                |
+|   +--------------+    +------------+    +------------------+   |
+|   | BlockBuilder |--> | PostgreSQL | <--| HTTP API (:8090) |   |
+|   |    + Geth    |    |  payloads  |    | /blocks?after=N  |   |
+|   +--------------+    +------------+    +------------------+   |
+|          |                                                     |
+|          v                                                     |
+|   +--------------+                                             |
+|   | Redis        |                                             |
+|   | - Election   |                                             |
+|   | - State      |                                             |
+|   +--------------+                                             |
++----------------------------------------------------------------+
+                                |
+                                |  GET /blocks?after=N
+                                |
+         +----------------------+----------------------+
+         |                      |                      |
+         v                      v                      v
+  +-------------+        +-------------+        +-------------+
+  | Member 1    |        | Member 2    |        | Member 3    |
+  | Syncer+Geth |        | Syncer+Geth |        | Syncer+Geth |
+  | +PostgreSQL |        | +PostgreSQL |        | +PostgreSQL |
+  +-------------+        +-------------+        +-------------+
 ```
 
 The **leader** builds blocks on Geth, stores payloads in PostgreSQL, and exposes an HTTP API. **Member nodes** poll that API, execute each block on their own Geth via the Engine API, and store the results in their local PostgreSQL, making each member a full execution replica that can serve RPC queries (eth_call, eth_getBalance, etc.) without touching the leader.

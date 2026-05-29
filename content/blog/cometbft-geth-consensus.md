@@ -14,37 +14,36 @@ The Redis-based system from [Part 3](/blog/redis-distributed-consensus) tolerate
 
 Each validator runs a CometBFT node paired with a Geth instance. CometBFT handles consensus (who proposes, who votes, when to finalize), while Geth handles execution (building blocks, running the EVM). They communicate through ABCI, the Application Blockchain Interface.
 
-```text
-┌─────────────────────────────────────────────────────────┐
-│                   CometBFT Consensus                    │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐         │
-│  │ Validator 1│  │ Validator 2│  │ Validator 3│         │
-│  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘         │
-│        └───────────────┼───────────────┘                │
-│                  P2P Gossip Network                     │
-└────────────────────────┼────────────────────────────────┘
-                         │
-                    ABCI (Local)
-                         │
-┌────────────────────────▼────────────────────────────────┐
-│                   ABCI Application                      │
-│  ┌────────────────────────────────────────────────────┐ │
-│  │  GethConsensusApp                                  │ │
-│  │  ├─ PrepareProposal() → Build block via Engine API │ │
-│  │  ├─ ProcessProposal() → Validate proposed block    │ │
-│  │  ├─ FinalizeBlock()   → Execute via NewPayload     │ │
-│  │  └─ Commit()          → Acknowledge block          │ │
-│  └────────────────────────────────────────────────────┘ │
-│                         │                               │
-│                Engine API (HTTP + JWT)                  │
-└─────────────────────────┼───────────────────────────────┘
-                          │
-┌─────────────────────────▼───────────────────────────────┐
-│                        Geth                             │
-│  ├─ Block Builder       (Assembles transactions)        │
-│  ├─ State Machine       (Executes EVM)                  │
-│  └─ Storage             (Persists chain)                │
-└─────────────────────────────────────────────────────────┘
+```goat
++------------------------------------------------------------+
+|                    CometBFT Consensus                      |
+|                                                            |
+|    +-------------+   +-------------+   +-------------+     |
+|    | Validator 1 |   | Validator 2 |   | Validator 3 |     |
+|    +-------------+   +-------------+   +-------------+     |
+|                     P2P Gossip Network                     |
++------------------------------------------------------------+
+                              |
+                              |  ABCI (Local)
+                              v
++------------------------------------------------------------+
+|                    ABCI Application                        |
+|                                                            |
+|   GethConsensusApp                                         |
+|     PrepareProposal()  ->  Build block via Engine API      |
+|     ProcessProposal()  ->  Validate proposed block         |
+|     FinalizeBlock()    ->  Execute via NewPayload          |
+|     Commit()           ->  Acknowledge block               |
++------------------------------------------------------------+
+                              |
+                              |  Engine API (HTTP + JWT)
+                              v
++------------------------------------------------------------+
+|                            Geth                            |
+|     Block Builder   (Assembles transactions)               |
+|     State Machine   (Executes EVM)                         |
+|     Storage         (Persists chain)                       |
++------------------------------------------------------------+
 ```
 
 This mirrors Ethereum's post-merge architecture: separate consensus and execution layers connected by the Engine API. The difference: CometBFT replaces the Beacon Chain, running BFT consensus over a configurable validator set.
@@ -62,45 +61,45 @@ This mirrors Ethereum's post-merge architecture: separate consensus and executio
 
 CometBFT uses a three-phase commit protocol. A designated proposer builds a block, all validators vote on it, and if >2/3 agree, the block is finalized. Each phase maps to an ABCI method in our application:
 
-```text
-Height H
-    │
-    ▼
-┌───────────────────────────────────────────────┐
-│  PROPOSE                                      │
-│  Proposer calls PrepareProposal()             │
-│    1. ForkchoiceUpdatedV3 (start building)    │
-│    2. Wait 300ms for transactions             │
-│    3. GetPayloadV5 (retrieve built block)     │
-│    4. Wrap payload as CometBFT transaction    │
-└──────────────────────┬────────────────────────┘
-                       ▼
-┌───────────────────────────────────────────────┐
-│  PREVOTE                                      │
-│  All validators call ProcessProposal()        │
-│    • Verify parent hash matches local head    │
-│    • Verify block height is sequential        │
-│    • Verify timestamp is increasing           │
-│    • Vote ACCEPT or REJECT                    │
-└──────────────────────┬────────────────────────┘
-                       ▼
-┌───────────────────────────────────────────────┐
-│  PRECOMMIT                                    │
-│  Validators commit if >2/3 prevoted           │
-│    • Sign precommit message                   │
-│    • Broadcast to network                     │
-└──────────────────────┬────────────────────────┘
-                       ▼
-┌───────────────────────────────────────────────┐
-│  FINALIZATION                                 │
-│  All nodes call FinalizeBlock()               │
-│    1. NewPayloadV4 (submit to Geth)           │
-│    2. ForkchoiceUpdatedV3 (set as head)       │
-│    3. Save execution head to Badger DB        │
-│    4. Block is FINAL, no reorgs possible      │
-└──────────────────────┬────────────────────────┘
-                       ▼
-                   Height H+1
+```goat
+                      Height H
+                          |
+                          v
++--------------------------------------------------+
+| PROPOSE  (proposer calls PrepareProposal)        |
+| 1. ForkchoiceUpdatedV3 (start building)          |
+| 2. Wait 300ms for transactions                   |
+| 3. GetPayloadV5 (retrieve built block)           |
+| 4. Wrap payload as CometBFT transaction          |
++--------------------------------------------------+
+                          |
+                          v
++--------------------------------------------------+
+| PREVOTE  (all validators call ProcessProposal)   |
+| - Verify parent hash matches local head          |
+| - Verify block height is sequential              |
+| - Verify timestamp is increasing                 |
+| - Vote ACCEPT or REJECT                          |
++--------------------------------------------------+
+                          |
+                          v
++--------------------------------------------------+
+| PRECOMMIT  (commit if >2/3 prevoted)             |
+| - Sign precommit message                         |
+| - Broadcast to network                           |
++--------------------------------------------------+
+                          |
+                          v
++--------------------------------------------------+
+| FINALIZATION  (all nodes call FinalizeBlock)     |
+| 1. NewPayloadV4 (submit to Geth)                 |
+| 2. ForkchoiceUpdatedV3 (set as head)             |
+| 3. Save execution head to Badger DB              |
+| 4. Block is FINAL, no reorgs possible            |
++--------------------------------------------------+
+                          |
+                          v
+                      Height H+1
 ```
 
 ## ABCI Application
