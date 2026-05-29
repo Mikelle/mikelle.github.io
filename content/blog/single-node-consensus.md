@@ -398,7 +398,7 @@ func (app *SingleNodeApp) setConnectionStatus(err error) {
 
 ## The Run Loop
 
-The heart of block production:
+Block production runs here:
 
 ```go
 func (app *SingleNodeApp) Start() {
@@ -563,7 +563,7 @@ Scrape `http://localhost:8080/metrics` to monitor your consensus layer.
 
 ## What's Next
 
-We now have a production-ready single-node consensus. But what happens when this node fails? In **[Part 3: Distributed Consensus with Redis, PostgreSQL, and Member Nodes](/blog/redis-distributed-consensus)**, we'll add:
+We now have a production-ready single-node consensus, but a single node is also a single point of failure: when it dies, block production stops. **[Part 3: Distributed Consensus with Redis, PostgreSQL, and Member Nodes](/blog/redis-distributed-consensus)** adds:
 
 - Leader election with Redis
 - Durable payload storage in PostgreSQL

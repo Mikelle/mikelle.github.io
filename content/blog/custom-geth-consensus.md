@@ -8,9 +8,9 @@ tags: ["consensus", "geth", "tutorial"]
 
 *Part 1 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
 
-When Ethereum transitioned to Proof of Stake, Geth introduced the Engine API - a clean interface between execution and consensus layers. While designed for beacon chain integration, it also enables building custom consensus mechanisms.
+When Ethereum moved to Proof of Stake, Geth introduced the Engine API to split the execution layer from the consensus layer. It was built for beacon chain clients, but nothing stops you from putting your own consensus logic on the other end.
 
-This series builds a complete custom consensus layer from scratch. We'll start with fundamentals and progress to a production-ready distributed system. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial).
+This series does exactly that. It starts with raw Engine API calls and ends with a distributed, fault-tolerant system. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial).
 
 ## Why Build Custom Consensus?
 

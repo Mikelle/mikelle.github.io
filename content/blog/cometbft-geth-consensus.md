@@ -47,7 +47,7 @@ Each validator runs a CometBFT node paired with a Geth instance. CometBFT handle
 └─────────────────────────────────────────────────────────┘
 ```
 
-This mirrors Ethereum's post-merge architecture: separate consensus and execution layers connected by the Engine API. The difference: CometBFT replaces the Beacon Chain, giving us BFT consensus with configurable validators.
+This mirrors Ethereum's post-merge architecture: separate consensus and execution layers connected by the Engine API. The difference: CometBFT replaces the Beacon Chain, running BFT consensus over a configurable validator set.
 
 ### Redis Consensus vs CometBFT
 
@@ -650,7 +650,7 @@ CometBFT handles peer discovery, proposer rotation, and vote aggregation automat
 
 ## What's Next
 
-CometBFT opens up several extensions from here: **[vote extensions](https://docs.cometbft.com/v0.38/spec/abci/abci++_app_requirements#vote-extensions)** for embedding extra data in consensus votes and **[state sync](https://docs.cometbft.com/v0.38/core/state-sync)** for fast node bootstrapping.
+From here, two CometBFT features are worth exploring: **[vote extensions](https://docs.cometbft.com/v0.38/spec/abci/abci++_app_requirements#vote-extensions)**, which embed extra data in consensus votes, and **[state sync](https://docs.cometbft.com/v0.38/core/state-sync)**, which bootstraps new nodes quickly.
 
 ---
 

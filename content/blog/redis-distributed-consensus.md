@@ -295,7 +295,7 @@ The local head is updated first so the next block builds from the right point ev
 
 ## HTTP API for Member Sync
 
-The leader exposes a simple HTTP API backed by PostgreSQL:
+The leader exposes an HTTP API backed by PostgreSQL:
 
 ```go
 func NewServer(store *postgres.PayloadStore, addr string, logger *slog.Logger) *Server {
@@ -537,7 +537,7 @@ curl localhost:8081/health  # OK (mode=member, lastSynced=1, totalSynced=1)
 
 ## What's Next
 
-We now have a distributed consensus system with leader election, durable storage, and horizontally scalable member nodes that are full execution replicas. In **[Part 4: CometBFT Integration](/blog/cometbft-geth-consensus)**, we replace the custom leader election with proper BFT consensus, where multiple validators agree on blocks through voting rounds, with instant finality.
+We now have a distributed consensus system with leader election, durable storage, and horizontally scalable member nodes that are full execution replicas. In **[Part 4: CometBFT Integration](/blog/cometbft-geth-consensus)**, we replace the custom leader election with BFT consensus, where multiple validators agree on each block through voting rounds and reach instant finality.
 
 ---
 
