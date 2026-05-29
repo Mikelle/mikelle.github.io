@@ -594,8 +594,7 @@ a:hover {
 }
 
 .article-body .goat svg {
-    width: 100%;
-    max-width: 640px;
+    max-width: 100%;
     height: auto;
     color: var(--text);
 }

@@ -1,0 +1,9 @@
+{{- $svg := diagrams.Goat (trim .Inner "\n") -}}
+<div class="goat">
+  <svg xmlns="http://www.w3.org/2000/svg"
+       font-family="Menlo,Lucida Console,monospace"
+       viewBox="0 0 {{ $svg.Width }} {{ $svg.Height }}"
+       width="{{ $svg.Width }}" height="{{ $svg.Height }}">
+    {{ $svg.Inner }}
+  </svg>
+</div>
