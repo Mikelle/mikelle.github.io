@@ -11,6 +11,8 @@
     --red: #f85149;
     --border: #30363d;
     --accent: #3fb950;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --font-prose: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 [data-theme="light"] {
@@ -135,7 +137,7 @@ html {
 }
 
 body {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--font-mono);
     background: var(--bg);
     color: var(--text);
     line-height: 1.6;
@@ -555,7 +557,18 @@ a:focus-visible,
 
 .article-body {
     color: var(--text);
+    font-family: var(--font-prose);
+    font-size: 15px;
     line-height: 1.8;
+}
+
+/* Keep terminal/code elements monospaced within prose */
+.article-body h2,
+.article-body h3,
+.article-body code,
+.article-body pre,
+.article-body .goat {
+    font-family: var(--font-mono);
 }
 
 .article-body h2 {
@@ -751,6 +764,47 @@ a:focus-visible,
     border-left: 2px solid var(--border);
     padding-left: 1rem;
 }
+
+/* Hero */
+.hero-intro { margin-bottom: 1rem; }
+.hero-name { color: var(--text); font-size: 1.1rem; }
+.hero-location { color: var(--text-dim); margin-top: 0.5rem; }
+
+/* Section "more" link + empty states */
+.more-link { margin-top: 1rem; }
+.prompt-spaced { margin-top: 2rem; }
+.empty-msg { color: var(--text-dim); margin-top: 1rem; }
+
+/* Notes list title link */
+.log-title a { color: var(--text); }
+
+/* Single article title + footer */
+.article-header .article-title {
+    font-size: 1.3rem;
+    margin-top: 0.5rem;
+}
+
+.article-footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+/* 404 page */
+.error-screen {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.error-line { color: var(--red); margin-bottom: 1rem; }
+.error-code { color: var(--text-dim); margin-bottom: 2rem; }
+.error-links { margin-top: 1rem; }
+.error-links a { margin-right: 2rem; }
+.error-links a:last-child { margin-right: 0; }
+.error-back { margin-top: 3rem; }
+.error-back a { color: var(--green); }
 
 /* Responsive */
 @media (max-width: 600px) {
