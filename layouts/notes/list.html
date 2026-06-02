@@ -5,7 +5,7 @@
 
 {{ range .Pages }}
 <div class="log-entry">
-    <div class="log-date">// {{ .Date.Format "2006.01" }}</div>
+    <div class="log-date">// {{ .Date.Format "2006.01.02" }}</div>
     <div class="log-title"><a href="{{ .Permalink }}" style="color: var(--text);">{{ .Title }}</a></div>
     <div class="log-content">
         {{ .Summary }}

@@ -170,7 +170,7 @@
     <div class="output">
         {{ range first 3 $blogPages }}
         <div class="blog-item">
-            <span class="blog-status">[{{ if .Draft }}draft{{ else }}{{ .Date.Format "01.06" }}{{ end }}]</span>
+            <span class="blog-status">[{{ if .Draft }}draft{{ else }}{{ .Date.Format "2006.01.02" }}{{ end }}]</span>
             <span class="blog-title"><a href="{{ .Permalink }}">{{ .Title }}</a></span>
         </div>
         {{ end }}
@@ -193,7 +193,7 @@
     <div class="output">
         {{ range first 3 $notesPages }}
         <div class="blog-item">
-            <span class="blog-status">[{{ .Date.Format "01.06" }}]</span>
+            <span class="blog-status">[{{ .Date.Format "2006.01.02" }}]</span>
             <span class="blog-title"><a href="{{ .Permalink }}">{{ .Title }}</a></span>
         </div>
         {{ end }}
