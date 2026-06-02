@@ -5,11 +5,11 @@
         <span class="prompt">~$</span> <span class="command">whoami</span>
     </div>
     <div class="output">
-        <div style="margin-bottom: 1rem;">
-            <strong style="color: var(--text); font-size: 1.1rem;">Mikhail Wall</strong>
+        <div class="hero-intro">
+            <strong class="hero-name">Mikhail Wall</strong>
         </div>
         <div>Protocol Engineer. L2, MEV, DeFi infrastructure.</div>
-        <div style="color: var(--text-dim); margin-top: 0.5rem;">{{ .Site.Params.location }}</div>
+        <div class="hero-location">{{ .Site.Params.location }}</div>
     </div>
 </section>
 
@@ -175,7 +175,7 @@
         </div>
         {{ end }}
         {{ if gt (len $blogPages) 3 }}
-        <div style="margin-top: 1rem;">
+        <div class="more-link">
             <a href="/blog/">more →</a>
         </div>
         {{ end }}
@@ -198,7 +198,7 @@
         </div>
         {{ end }}
         {{ if gt (len $notesPages) 3 }}
-        <div style="margin-top: 1rem;">
+        <div class="more-link">
             <a href="/notes/">more →</a>
         </div>
         {{ end }}
@@ -247,7 +247,7 @@
     </div>
 
     <div class="terminal-output"></div>
-    <div class="cmd-line terminal-input-line" style="margin-top: 2rem;">
+    <div class="cmd-line terminal-input-line prompt-spaced">
         <span class="prompt">~$</span>
         <input type="text" class="terminal-input" placeholder="type 'help' for commands" spellcheck="false" autocomplete="off" autocapitalize="off">
     </div>
