@@ -10,6 +10,7 @@
     --cyan: #39c5cf;
     --red: #f85149;
     --border: #30363d;
+    --accent: #3fb950;
 }
 
 [data-theme="light"] {
@@ -24,6 +25,7 @@
     --cyan: #1b7c83;
     --red: #cf222e;
     --border: #d0d7de;
+    --accent: #1a7f37;
 }
 
 /* Background Effects */
@@ -154,6 +156,14 @@ a {
 a:hover {
     color: #79c0ff;
     text-decoration: none;
+}
+
+a:focus-visible,
+.theme-toggle:focus-visible,
+.terminal-input:focus-visible {
+    outline: 1px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
 }
 
 /* Terminal Window */
@@ -746,10 +756,11 @@ a:hover {
 @media (max-width: 600px) {
     .terminal-header {
         padding: 1rem 1.25rem;
+        flex-wrap: wrap;
     }
 
     .terminal-title {
-        flex: 1;
+        display: none;
     }
 
     .theme-toggle {
@@ -761,7 +772,16 @@ a:hover {
     }
 
     .terminal-nav {
-        display: none;
+        order: 3;
+        width: 100%;
+        margin-left: 0;
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .terminal-nav a {
+        padding: 0.25rem 0.5rem;
     }
 
     .terminal-nav::after {
