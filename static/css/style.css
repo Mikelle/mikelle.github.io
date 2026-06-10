@@ -944,7 +944,7 @@ a:focus-visible,
 /* ===== Syntax highlighting (chroma): github for light theme ===== */
 
 /* Background */ [data-theme="light"] .bg { background-color:#f7f7f7; }
-/* PreWrapper */ [data-theme="light"] .chroma { background-color:#f7f7f7;-webkit-text-size-adjust:none; }
+/* PreWrapper */ [data-theme="light"] .chroma { color:#1f2328;background-color:#f7f7f7;-webkit-text-size-adjust:none; }
 /* Error */ [data-theme="light"] .chroma .err { color:#f6f8fa;background-color:#82071e }
 /* LineLink */ [data-theme="light"] .chroma .lnlinks { outline:none;text-decoration:none;color:inherit }
 /* LineTableTD */ [data-theme="light"] .chroma .lntd { vertical-align:top;padding:0;margin:0;border:0; }
@@ -1014,4 +1014,15 @@ a:focus-visible,
 /* GenericInserted */ [data-theme="light"] .chroma .gi { color:#116329;background-color:#dafbe1 }
 /* GenericOutput */ [data-theme="light"] .chroma .go { color:#1f2328 }
 /* GenericUnderline */ [data-theme="light"] .chroma .gl { text-decoration:underline }
-/* TextWhitespace */ [data-theme="light"] .chroma .w { color:#fff }
+/* TextWhitespace */ [data-theme="light"] .chroma .w { color:#1f2328 }
+
+/* Tokens defined by github-dark but not github: map to light palette */
+/* NameException */ [data-theme="light"] .chroma .ne { color:#cf222e }
+/* NameProperty */ [data-theme="light"] .chroma .py { color:#0550ae }
+/* Literal */ [data-theme="light"] .chroma .l { color:#0a3069 }
+/* LiteralDate */ [data-theme="light"] .chroma .ld { color:#0550ae }
+/* GenericError */ [data-theme="light"] .chroma .gr { color:#82071e }
+/* GenericHeading */ [data-theme="light"] .chroma .gh { color:#0550ae }
+/* GenericPrompt */ [data-theme="light"] .chroma .gp { color:#57606a }
+/* GenericSubheading */ [data-theme="light"] .chroma .gu { color:#0550ae }
+/* GenericTraceback */ [data-theme="light"] .chroma .gt { color:#cf222e }
