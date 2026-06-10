@@ -418,11 +418,13 @@ After execution, the block is saved to the member's local PostgreSQL. On startup
 
 The application runs in two modes: `--mode leader` or `--mode member`.
 
-**Leader mode** sets up the full stack: Redis, Geth, PostgreSQL, leader election, block production, and the HTTP API. The run loop is the same as [Part 2](/blog/single-node-consensus) with one addition: only produce blocks when elected leader.
+**Leader mode** sets up the full stack: Redis, Geth, PostgreSQL, leader election, block production, and the HTTP API. The run loop is the same as [Part 2](/blog/single-node-consensus) with two additions: only produce blocks when elected leader, and sync from the current leader while on standby.
 
 ```go
 func (app *MemberNodesApp) runLeaderLoop() {
     app.stateManager.ResetBlockState(app.appCtx)
+
+    var stopSync context.CancelFunc
 
     for {
         select {
@@ -430,8 +432,21 @@ func (app *MemberNodesApp) runLeaderLoop() {
             return
         default:
             if !app.leaderElection.IsLeader() {
+                // Standby: sync from the current leader while waiting
+                if stopSync == nil {
+                    var syncCtx context.Context
+                    syncCtx, stopSync = context.WithCancel(app.appCtx)
+                    app.syncer.Start(syncCtx)
+                }
                 time.Sleep(100 * time.Millisecond)
                 continue
+            }
+
+            if stopSync != nil {
+                // Acquired the lock: stop syncing, produce from the synced head
+                stopSync()
+                stopSync = nil
+                app.stateManager.ResetBlockState(app.appCtx)
             }
 
             err := app.produceBlock()
@@ -533,7 +548,7 @@ curl localhost:8081/health  # OK (mode=member, lastSynced=1, totalSynced=1)
 # A synced standby (if running) acquires the lock and resumes block production
 ```
 
-One caveat: a standby that only waits on the lock never executes blocks, so its Geth would be stale at takeover and it would build on an old head, forking the chain. A standby must also run the member syncer while waiting, so its Geth tracks the leader's head. When it acquires the lock, it stops syncing and starts producing from an up-to-date head.
+This is why standbys run the member syncer while waiting on the lock. A standby that only waited would never execute blocks, so its Geth would be stale at takeover and it would build on an old head, forking the chain. Syncing keeps its Geth at the leader's head; on acquiring the lock it stops syncing and produces from fresh state.
 
 ## Failure Scenarios
 
