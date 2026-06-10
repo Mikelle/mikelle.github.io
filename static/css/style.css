@@ -334,6 +334,10 @@ a:focus-visible,
     margin-bottom: 2rem;
 }
 
+.output p + p {
+    margin-top: 1rem;
+}
+
 /* Tree View */
 .tree {
     margin: 1rem 0;
