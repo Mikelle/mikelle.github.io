@@ -1,7 +1,7 @@
 {{ define "main" }}
 <section class="section error-screen">
     <div class="cmd-line">
-        <span class="prompt">~$</span> <span class="command">cd</span> <span class="string">/unknown</span>
+        <span class="prompt" aria-hidden="true">~$</span> <span class="command">cd</span> <span class="string">/unknown</span>
     </div>
     <div class="output more-link">
         <div class="error-line">
@@ -11,7 +11,7 @@
             Error 404 — page not found
         </div>
         <div class="cmd-line">
-            <span class="prompt">~$</span> <span class="command">ls</span> <span class="string">available/</span>
+            <span class="prompt" aria-hidden="true">~$</span> <span class="command">ls</span> <span class="string">available/</span>
         </div>
         <div class="error-links">
             <a href="/">~/home</a>
@@ -20,7 +20,7 @@
         </div>
     </div>
     <div class="cmd-line error-back">
-        <span class="prompt">~$</span> <a href="/">cd ~</a>
+        <span class="prompt" aria-hidden="true">~$</span> <a href="/">cd ~</a>
     </div>
 </section>
 {{ end }}

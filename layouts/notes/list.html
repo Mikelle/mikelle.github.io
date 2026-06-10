@@ -1,6 +1,7 @@
 {{ define "main" }}
+<h1 class="sr-only">Notes</h1>
 <div class="cmd-line">
-    <span class="prompt">~$</span> <span class="command">cat</span> <span class="string">notes.log</span>
+    <span class="prompt" aria-hidden="true">~$</span> <span class="command">cat</span> <span class="string">notes.log</span>
 </div>
 
 {{ range .Pages }}

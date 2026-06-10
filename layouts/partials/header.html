@@ -1,9 +1,9 @@
-<div class="terminal-header">
-    <div class="terminal-btn red"></div>
-    <div class="terminal-btn yellow"></div>
-    <div class="terminal-btn green"></div>
+<header class="terminal-header">
+    <div class="terminal-btn red" aria-hidden="true"></div>
+    <div class="terminal-btn yellow" aria-hidden="true"></div>
+    <div class="terminal-btn green" aria-hidden="true"></div>
     <span class="terminal-title">{{ if .IsHome }}mikhail@wall:~{{ else }}{{ .Title }}{{ end }}</span>
-    <nav class="terminal-nav">
+    <nav class="terminal-nav" aria-label="Main">
         {{ if .IsHome }}
             {{ range .Site.Menus.main }}
             <a href="{{ .URL }}">{{ .Name }}</a>
@@ -12,5 +12,5 @@
             <a href="/">← back</a>
         {{ end }}
     </nav>
-    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">☀</button>
-</div>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">☀</button>
+</header>

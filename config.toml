@@ -2,6 +2,7 @@ baseURL = "https://mikelle.github.io/"
 enableRobotsTXT = true
 languageCode = "en-us"
 title = "Mikhail Wall"
+disableKinds = ["taxonomy", "term"]
 
 [params]
   description = "Protocol Engineer. L2, MEV, DeFi infrastructure."
@@ -19,7 +20,7 @@ title = "Mikhail Wall"
     codeFences = true
     guessSyntax = true
     lineNos = false
-    style = "github-dark"
+    noClasses = false
 
 [menu]
   [[menu.main]]

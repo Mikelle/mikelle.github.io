@@ -2,11 +2,11 @@
 <!-- Hero -->
 <section class="section">
     <div class="cmd-line">
-        <span class="prompt">~$</span> <span class="command">whoami</span>
+        <span class="prompt" aria-hidden="true">~$</span> <span class="command">whoami</span>
     </div>
     <div class="output">
         <div class="hero-intro">
-            <strong class="hero-name">Mikhail Wall</strong>
+            <h1 class="hero-name">Mikhail Wall</h1>
         </div>
         <div>Protocol Engineer. L2, MEV, DeFi infrastructure.</div>
         <div class="hero-location">{{ .Site.Params.location }}</div>
@@ -16,21 +16,21 @@
 <!-- About -->
 <section id="about" class="section">
     <div class="cmd-line">
-        <span class="prompt">~$</span> <span class="command">cat</span> <span class="string">README.md</span>
+        <span class="prompt" aria-hidden="true">~$</span> <span class="command">cat</span> <span class="string">README.md</span>
     </div>
     <div class="output">
         <p>Previously: DeFi infrastructure at <a href="https://infrared.finance">Infrared Finance</a>, core contributor to <a href="https://polygon.technology/polygon-zkevm">Polygon zkEVM</a>, P2P networks at <a href="https://primev.xyz">Primev</a> (a16z), algorithmic trading at <a href="https://anboto.xyz">Anboto Labs</a>.</p>
     </div>
 
     <div class="cmd-line">
-        <span class="prompt">~$</span> <span class="command">ls</span> <span class="string">skills/</span>
+        <span class="prompt" aria-hidden="true">~$</span> <span class="command">ls</span> <span class="string">skills/</span>
     </div>
     <div class="output">
         <div class="tree">
-            <div class="tree-item"><span class="tree-branch">├──</span> <span class="tree-dir">languages/</span> <span class="tree-file">Golang, Solidity, TypeScript, Python, Rust</span></div>
-            <div class="tree-item"><span class="tree-branch">├──</span> <span class="tree-dir">blockchain/</span> <span class="tree-file">Geth/EVM, Foundry, libp2p, cometBFT</span></div>
-            <div class="tree-item"><span class="tree-branch">├──</span> <span class="tree-dir">infra/</span> <span class="tree-file">PostgreSQL, Redis, Docker/k8s, Terraform</span></div>
-            <div class="tree-item"><span class="tree-branch">└──</span> <span class="tree-dir">domains/</span> <span class="tree-file">L2/zkEVM, MEV/PBS, DeFi, P2P, Cryptography</span></div>
+            <div class="tree-item"><span class="tree-branch" aria-hidden="true">├──</span> <span class="tree-dir">languages/</span> <span class="tree-file">Golang, Solidity, TypeScript, Python, Rust</span></div>
+            <div class="tree-item"><span class="tree-branch" aria-hidden="true">├──</span> <span class="tree-dir">blockchain/</span> <span class="tree-file">Geth/EVM, Foundry, libp2p, cometBFT</span></div>
+            <div class="tree-item"><span class="tree-branch" aria-hidden="true">├──</span> <span class="tree-dir">infra/</span> <span class="tree-file">PostgreSQL, Redis, Docker/k8s, Terraform</span></div>
+            <div class="tree-item"><span class="tree-branch" aria-hidden="true">└──</span> <span class="tree-dir">domains/</span> <span class="tree-file">L2/zkEVM, MEV/PBS, DeFi, P2P, Cryptography</span></div>
         </div>
     </div>
 </section>
@@ -38,7 +38,7 @@
 <!-- Experience -->
 <section id="experience" class="section">
     <div class="cmd-line">
-        <span class="prompt">~$</span> <span class="command">git log</span> <span class="flag">--oneline</span> <span class="string">career</span>
+        <span class="prompt" aria-hidden="true">~$</span> <span class="command">git log</span> <span class="flag">--oneline</span> <span class="string">career</span>
     </div>
     <div class="output">
         <div class="exp-item">
@@ -125,7 +125,7 @@
 <!-- Projects -->
 <section id="projects" class="section">
     <div class="cmd-line">
-        <span class="prompt">~$</span> <span class="command">find</span> <span class="string">~/projects</span> <span class="flag">-type d</span>
+        <span class="prompt" aria-hidden="true">~$</span> <span class="command">find</span> <span class="string">~/projects</span> <span class="flag">-type d</span>
     </div>
     <div class="output">
         <div class="project">
@@ -165,7 +165,7 @@
 {{ if $blogPages }}
 <section class="section">
     <div class="cmd-line">
-        <span class="prompt">~$</span> <span class="command">ls</span> <span class="string">blog/</span>
+        <span class="prompt" aria-hidden="true">~$</span> <span class="command">ls</span> <span class="string">blog/</span>
     </div>
     <div class="output">
         {{ range first 3 $blogPages }}
@@ -188,7 +188,7 @@
 {{ if $notesPages }}
 <section class="section">
     <div class="cmd-line">
-        <span class="prompt">~$</span> <span class="command">tail</span> <span class="flag">-n 3</span> <span class="string">notes.log</span>
+        <span class="prompt" aria-hidden="true">~$</span> <span class="command">tail</span> <span class="flag">-n 3</span> <span class="string">notes.log</span>
     </div>
     <div class="output">
         {{ range first 3 $notesPages }}
@@ -209,14 +209,14 @@
 <!-- Interests -->
 <section id="interests" class="section">
     <div class="cmd-line">
-        <span class="prompt">~$</span> <span class="command">cat</span> <span class="string">.interests</span>
+        <span class="prompt" aria-hidden="true">~$</span> <span class="command">cat</span> <span class="string">.interests</span>
     </div>
     <div class="output">
         <div class="tree">
-            <div class="tree-item"><span class="tree-branch">├──</span> <span class="tree-dir">gym/</span> <span class="tree-file">lifting heavy things, putting them back down</span></div>
-            <div class="tree-item"><span class="tree-branch">├──</span> <span class="tree-dir">books/</span> <span class="tree-file">sci-fi, history, philosophy</span></div>
-            <div class="tree-item"><span class="tree-branch">├──</span> <span class="tree-dir">skiing/</span> <span class="tree-file">mountains > beaches</span></div>
-            <div class="tree-item"><span class="tree-branch">└──</span> <span class="tree-dir">travel/</span> <span class="tree-file">ex-<a href="https://nomads.com/@mikwall">digital nomad</a>, 20+ countries</span></div>
+            <div class="tree-item"><span class="tree-branch" aria-hidden="true">├──</span> <span class="tree-dir">gym/</span> <span class="tree-file">lifting heavy things, putting them back down</span></div>
+            <div class="tree-item"><span class="tree-branch" aria-hidden="true">├──</span> <span class="tree-dir">books/</span> <span class="tree-file">sci-fi, history, philosophy</span></div>
+            <div class="tree-item"><span class="tree-branch" aria-hidden="true">├──</span> <span class="tree-dir">skiing/</span> <span class="tree-file">mountains > beaches</span></div>
+            <div class="tree-item"><span class="tree-branch" aria-hidden="true">└──</span> <span class="tree-dir">travel/</span> <span class="tree-file">ex-<a href="https://nomads.com/@mikwall">digital nomad</a>, 20+ countries</span></div>
         </div>
     </div>
 </section>
@@ -224,7 +224,7 @@
 <!-- Contact -->
 <section id="contact" class="section">
     <div class="cmd-line">
-        <span class="prompt">~$</span> <span class="command">cat</span> <span class="string">.contact</span>
+        <span class="prompt" aria-hidden="true">~$</span> <span class="command">cat</span> <span class="string">.contact</span>
     </div>
     <div class="output">
         <div class="contact-row">
@@ -248,8 +248,8 @@
 
     <div class="terminal-output"></div>
     <div class="cmd-line terminal-input-line prompt-spaced">
-        <span class="prompt">~$</span>
-        <input type="text" class="terminal-input" placeholder="type 'help' for commands" spellcheck="false" autocomplete="off" autocapitalize="off">
+        <span class="prompt" aria-hidden="true">~$</span>
+        <input type="text" class="terminal-input" aria-label="Terminal command input" placeholder="type 'help' for commands" spellcheck="false" autocomplete="off" autocapitalize="off">
     </div>
 </section>
 {{ end }}

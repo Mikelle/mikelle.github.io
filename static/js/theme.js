@@ -1,8 +1,12 @@
 (function() {
-    // Apply saved theme immediately to prevent flash
+    // Apply saved theme immediately to prevent flash; fall back to OS preference
     const saved = localStorage.getItem('theme');
     if (saved) {
-        document.documentElement.setAttribute('data-theme', saved);
+        if (saved === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        document.documentElement.setAttribute('data-theme', 'light');
     }
 })();
 
@@ -87,6 +91,14 @@ function initActiveNav() {
         });
     }
 
-    window.addEventListener('scroll', updateActiveNav);
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+            updateActiveNav();
+            ticking = false;
+        });
+    }, { passive: true });
     updateActiveNav();
 }

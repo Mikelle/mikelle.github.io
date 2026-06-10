@@ -6,9 +6,9 @@
     <title>{{ if .IsHome }}mikhail@wall:~${{ else }}{{ .Title }} | Mikhail Wall{{ end }}</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="alternate icon" type="image/png" href="/favicon.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/svg+xml" href="{{ "favicon.svg" | relURL }}">
+    <link rel="alternate icon" type="image/png" href="{{ "favicon.png" | relURL }}">
+    <link rel="apple-touch-icon" href="{{ "apple-touch-icon.png" | relURL }}">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="{{ .Permalink }}">
@@ -19,7 +19,7 @@
     {{ end }}
 
     <!-- Meta -->
-    <meta name="description" content="{{ if .Description }}{{ .Description }}{{ else }}Protocol Engineer. L2, MEV, DeFi infrastructure. Building at Infrared Finance.{{ end }}">
+    <meta name="description" content="{{ .Description | default (.Summary | plainify | truncate 160) | default .Site.Params.description }}">
     <meta name="author" content="Mikhail Wall">
 
     <!-- Structured Data -->
@@ -34,7 +34,7 @@
       "sameAs": [
         "https://github.com/Mikelle",
         "https://linkedin.com/in/mikhwall",
-        "https://twitter.com/mikhwall"
+        "https://x.com/mikhwall"
       ]
     }
     </script>
@@ -51,6 +51,8 @@
       },
       "datePublished": "{{ .Date.Format "2006-01-02" }}",
       {{ if .Lastmod }}"dateModified": "{{ .Lastmod.Format "2006-01-02" }}",{{ end }}
+      "image": "{{ "og-image.png" | absURL }}",
+      "mainEntityOfPage": "{{ .Permalink }}",
       "url": "{{ .Permalink }}"
     }
     </script>
@@ -59,35 +61,40 @@
     <!-- Open Graph -->
     <meta property="og:title" content="{{ if .IsHome }}Mikhail Wall - Protocol Engineer{{ else }}{{ .Title }} | Mikhail Wall{{ end }}">
     <meta property="og:description" content="{{ if .Description }}{{ .Description }}{{ else }}Protocol Engineer. L2, MEV, DeFi infrastructure.{{ end }}">
-    <meta property="og:type" content="{{ if .IsHome }}website{{ else }}article{{ end }}">
+    <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
     <meta property="og:url" content="{{ .Permalink }}">
-    <meta property="og:image" content="{{ .Site.BaseURL }}og-image.png">
+    <meta property="og:image" content="{{ "og-image.png" | absURL }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Mikhail Wall - Protocol Engineer">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@mikhwall">
     <meta name="twitter:title" content="{{ if .IsHome }}Mikhail Wall - Protocol Engineer{{ else }}{{ .Title }}{{ end }}">
     <meta name="twitter:description" content="{{ if .Description }}{{ .Description }}{{ else }}Protocol Engineer. L2, MEV, DeFi infrastructure.{{ end }}">
-    <meta name="twitter:image" content="{{ .Site.BaseURL }}og-image.png">
+    <meta name="twitter:image" content="{{ "og-image.png" | absURL }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" as="style">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
-    <script src="/js/theme.js"></script>
-    <script src="/js/background.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+    <script src="{{ "js/theme.js" | relURL }}"></script>
+    {{ if not .IsPage }}
+    <script src="{{ "js/background.js" | relURL }}" defer></script>
+    {{ end }}
 </head>
 <body>
+    <a class="skip-link" href="#main">skip to content</a>
     <div class="terminal">
         {{ partial "header.html" . }}
-        <div class="terminal-body">
+        <main class="terminal-body" id="main">
             {{ block "main" . }}{{ end }}
-        </div>
+        </main>
         {{ partial "footer.html" . }}
     </div>
     {{ if .IsHome }}
-    <script src="/js/terminal.js"></script>
+    <script src="{{ "js/terminal.js" | relURL }}"></script>
     {{ end }}
 
     <!-- Analytics (GoatCounter) -->

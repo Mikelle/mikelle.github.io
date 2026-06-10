@@ -11,8 +11,10 @@
     --red: #f85149;
     --border: #30363d;
     --accent: #3fb950;
+    --blue-hover: #79c0ff;
     --font-mono: 'IBM Plex Mono', monospace;
     --font-prose: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color-scheme: dark;
 }
 
 [data-theme="light"] {
@@ -28,18 +30,8 @@
     --red: #cf222e;
     --border: #d0d7de;
     --accent: #1a7f37;
-}
-
-/* Background Effects */
-.bg-effect {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
-    opacity: 0.4;
+    --blue-hover: #0550ae;
+    color-scheme: light;
 }
 
 /* Grid Background */
@@ -67,12 +59,11 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
     [data-bg="grid"] .terminal::before {
         animation: none;
-    }
-    .cursor {
-        animation: none;
-        opacity: 1;
     }
 }
 
@@ -141,12 +132,42 @@ body {
     background: var(--bg);
     color: var(--text);
     line-height: 1.6;
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 
 ::selection {
-    background: var(--green);
+    background: var(--accent);
     color: var(--bg);
+}
+
+/* Visually hidden (screen readers only) */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Skip link: hidden until focused */
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    background: var(--bg-secondary);
+    color: var(--text);
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0 0 4px 4px;
+    z-index: 200;
+}
+
+.skip-link:focus {
+    top: 0;
 }
 
 a {
@@ -156,7 +177,7 @@ a {
 }
 
 a:hover {
-    color: #79c0ff;
+    color: var(--blue-hover);
     text-decoration: none;
 }
 
@@ -193,9 +214,9 @@ a:focus-visible,
     border-radius: 50%;
 }
 
-.terminal-btn.red { background: #f85149; }
-.terminal-btn.yellow { background: #d29922; }
-.terminal-btn.green { background: #3fb950; }
+.terminal-btn.red { background: var(--red); }
+.terminal-btn.yellow { background: var(--yellow); }
+.terminal-btn.green { background: var(--green); }
 
 .terminal-title {
     margin-left: 1rem;
@@ -311,22 +332,6 @@ a:focus-visible,
 .output {
     margin-left: 0;
     margin-bottom: 2rem;
-}
-
-/* Cursor */
-.cursor {
-    display: inline-block;
-    width: 8px;
-    height: 16px;
-    background: var(--green);
-    animation: blink 1s infinite;
-    vertical-align: middle;
-    margin-left: 2px;
-}
-
-@keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
 }
 
 /* Tree View */
@@ -558,7 +563,7 @@ a:focus-visible,
 .article-body {
     color: var(--text);
     font-family: var(--font-prose);
-    font-size: 15px;
+    font-size: 0.9375rem;
     line-height: 1.8;
 }
 
@@ -566,8 +571,7 @@ a:focus-visible,
 .article-body h2,
 .article-body h3,
 .article-body code,
-.article-body pre,
-.article-body .goat {
+.article-body pre {
     font-family: var(--font-mono);
 }
 
@@ -626,13 +630,13 @@ a:focus-visible,
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;
-    background: rgba(13, 17, 23, 0.8);
+    background: var(--bg-secondary);
     border: 1px solid var(--border);
     color: var(--text-dim);
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     cursor: pointer;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 0.75rem;
     opacity: 0;
     transition: opacity 0.2s;
@@ -657,6 +661,8 @@ a:focus-visible,
     border-collapse: collapse;
     margin: 1rem 0;
     width: 100%;
+    display: block;
+    overflow-x: auto;
 }
 
 .article-body th,
@@ -854,3 +860,158 @@ a:focus-visible,
         display: none !important;
     }
 }
+
+/* ===== Syntax highlighting (chroma): github-dark for dark theme ===== */
+
+/* Background */ .bg { color:#e6edf3;background-color:#0d1117; }
+/* PreWrapper */ .chroma { color:#e6edf3;background-color:#0d1117;-webkit-text-size-adjust:none; }
+/* Error */ .chroma .err { color:#f85149 }
+/* LineLink */ .chroma .lnlinks { outline:none;text-decoration:none;color:inherit }
+/* LineTableTD */ .chroma .lntd { vertical-align:top;padding:0;margin:0;border:0; }
+/* LineTable */ .chroma .lntable { border-spacing:0;padding:0;margin:0;border:0; }
+/* LineHighlight */ .chroma .hl { background-color:#6e7681 }
+/* LineNumbersTable */ .chroma .lnt { white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#737679 }
+/* LineNumbers */ .chroma .ln { white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#6e7681 }
+/* Line */ .chroma .line { display:flex; }
+/* Keyword */ .chroma .k { color:#ff7b72 }
+/* KeywordConstant */ .chroma .kc { color:#79c0ff }
+/* KeywordDeclaration */ .chroma .kd { color:#ff7b72 }
+/* KeywordNamespace */ .chroma .kn { color:#ff7b72 }
+/* KeywordPseudo */ .chroma .kp { color:#79c0ff }
+/* KeywordReserved */ .chroma .kr { color:#ff7b72 }
+/* KeywordType */ .chroma .kt { color:#ff7b72 }
+/* NameClass */ .chroma .nc { color:#f0883e;font-weight:bold }
+/* NameConstant */ .chroma .no { color:#79c0ff;font-weight:bold }
+/* NameDecorator */ .chroma .nd { color:#d2a8ff;font-weight:bold }
+/* NameEntity */ .chroma .ni { color:#ffa657 }
+/* NameException */ .chroma .ne { color:#f0883e;font-weight:bold }
+/* NameLabel */ .chroma .nl { color:#79c0ff;font-weight:bold }
+/* NameNamespace */ .chroma .nn { color:#ff7b72 }
+/* NameProperty */ .chroma .py { color:#79c0ff }
+/* NameTag */ .chroma .nt { color:#7ee787 }
+/* NameVariable */ .chroma .nv { color:#79c0ff }
+/* NameVariableClass */ .chroma .vc { color:#79c0ff }
+/* NameVariableGlobal */ .chroma .vg { color:#79c0ff }
+/* NameVariableInstance */ .chroma .vi { color:#79c0ff }
+/* NameVariableMagic */ .chroma .vm { color:#79c0ff }
+/* NameFunction */ .chroma .nf { color:#d2a8ff;font-weight:bold }
+/* NameFunctionMagic */ .chroma .fm { color:#d2a8ff;font-weight:bold }
+/* Literal */ .chroma .l { color:#a5d6ff }
+/* LiteralDate */ .chroma .ld { color:#79c0ff }
+/* LiteralString */ .chroma .s { color:#a5d6ff }
+/* LiteralStringAffix */ .chroma .sa { color:#79c0ff }
+/* LiteralStringBacktick */ .chroma .sb { color:#a5d6ff }
+/* LiteralStringChar */ .chroma .sc { color:#a5d6ff }
+/* LiteralStringDelimiter */ .chroma .dl { color:#79c0ff }
+/* LiteralStringDoc */ .chroma .sd { color:#a5d6ff }
+/* LiteralStringDouble */ .chroma .s2 { color:#a5d6ff }
+/* LiteralStringEscape */ .chroma .se { color:#79c0ff }
+/* LiteralStringHeredoc */ .chroma .sh { color:#79c0ff }
+/* LiteralStringInterpol */ .chroma .si { color:#a5d6ff }
+/* LiteralStringOther */ .chroma .sx { color:#a5d6ff }
+/* LiteralStringRegex */ .chroma .sr { color:#79c0ff }
+/* LiteralStringSingle */ .chroma .s1 { color:#a5d6ff }
+/* LiteralStringSymbol */ .chroma .ss { color:#a5d6ff }
+/* LiteralNumber */ .chroma .m { color:#a5d6ff }
+/* LiteralNumberBin */ .chroma .mb { color:#a5d6ff }
+/* LiteralNumberFloat */ .chroma .mf { color:#a5d6ff }
+/* LiteralNumberHex */ .chroma .mh { color:#a5d6ff }
+/* LiteralNumberInteger */ .chroma .mi { color:#a5d6ff }
+/* LiteralNumberIntegerLong */ .chroma .il { color:#a5d6ff }
+/* LiteralNumberOct */ .chroma .mo { color:#a5d6ff }
+/* Operator */ .chroma .o { color:#ff7b72;font-weight:bold }
+/* OperatorWord */ .chroma .ow { color:#ff7b72;font-weight:bold }
+/* Comment */ .chroma .c { color:#8b949e;font-style:italic }
+/* CommentHashbang */ .chroma .ch { color:#8b949e;font-style:italic }
+/* CommentMultiline */ .chroma .cm { color:#8b949e;font-style:italic }
+/* CommentSingle */ .chroma .c1 { color:#8b949e;font-style:italic }
+/* CommentSpecial */ .chroma .cs { color:#8b949e;font-weight:bold;font-style:italic }
+/* CommentPreproc */ .chroma .cp { color:#8b949e;font-weight:bold;font-style:italic }
+/* CommentPreprocFile */ .chroma .cpf { color:#8b949e;font-weight:bold;font-style:italic }
+/* GenericDeleted */ .chroma .gd { color:#ffa198;background-color:#490202 }
+/* GenericEmph */ .chroma .ge { font-style:italic }
+/* GenericError */ .chroma .gr { color:#ffa198 }
+/* GenericHeading */ .chroma .gh { color:#79c0ff;font-weight:bold }
+/* GenericInserted */ .chroma .gi { color:#56d364;background-color:#0f5323 }
+/* GenericOutput */ .chroma .go { color:#8b949e }
+/* GenericPrompt */ .chroma .gp { color:#8b949e }
+/* GenericStrong */ .chroma .gs { font-weight:bold }
+/* GenericSubheading */ .chroma .gu { color:#79c0ff }
+/* GenericTraceback */ .chroma .gt { color:#ff7b72 }
+/* GenericUnderline */ .chroma .gl { text-decoration:underline }
+/* TextWhitespace */ .chroma .w { color:#6e7681 }
+
+/* ===== Syntax highlighting (chroma): github for light theme ===== */
+
+/* Background */ [data-theme="light"] .bg { background-color:#f7f7f7; }
+/* PreWrapper */ [data-theme="light"] .chroma { background-color:#f7f7f7;-webkit-text-size-adjust:none; }
+/* Error */ [data-theme="light"] .chroma .err { color:#f6f8fa;background-color:#82071e }
+/* LineLink */ [data-theme="light"] .chroma .lnlinks { outline:none;text-decoration:none;color:inherit }
+/* LineTableTD */ [data-theme="light"] .chroma .lntd { vertical-align:top;padding:0;margin:0;border:0; }
+/* LineTable */ [data-theme="light"] .chroma .lntable { border-spacing:0;padding:0;margin:0;border:0; }
+/* LineHighlight */ [data-theme="light"] .chroma .hl { background-color:#dedede }
+/* LineNumbersTable */ [data-theme="light"] .chroma .lnt { white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f }
+/* LineNumbers */ [data-theme="light"] .chroma .ln { white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f }
+/* Line */ [data-theme="light"] .chroma .line { display:flex; }
+/* Keyword */ [data-theme="light"] .chroma .k { color:#cf222e }
+/* KeywordConstant */ [data-theme="light"] .chroma .kc { color:#cf222e }
+/* KeywordDeclaration */ [data-theme="light"] .chroma .kd { color:#cf222e }
+/* KeywordNamespace */ [data-theme="light"] .chroma .kn { color:#cf222e }
+/* KeywordPseudo */ [data-theme="light"] .chroma .kp { color:#cf222e }
+/* KeywordReserved */ [data-theme="light"] .chroma .kr { color:#cf222e }
+/* KeywordType */ [data-theme="light"] .chroma .kt { color:#cf222e }
+/* NameAttribute */ [data-theme="light"] .chroma .na { color:#1f2328 }
+/* NameClass */ [data-theme="light"] .chroma .nc { color:#1f2328 }
+/* NameConstant */ [data-theme="light"] .chroma .no { color:#0550ae }
+/* NameDecorator */ [data-theme="light"] .chroma .nd { color:#0550ae }
+/* NameEntity */ [data-theme="light"] .chroma .ni { color:#6639ba }
+/* NameLabel */ [data-theme="light"] .chroma .nl { color:#900;font-weight:bold }
+/* NameNamespace */ [data-theme="light"] .chroma .nn { color:#24292e }
+/* NameOther */ [data-theme="light"] .chroma .nx { color:#1f2328 }
+/* NameTag */ [data-theme="light"] .chroma .nt { color:#0550ae }
+/* NameBuiltin */ [data-theme="light"] .chroma .nb { color:#6639ba }
+/* NameBuiltinPseudo */ [data-theme="light"] .chroma .bp { color:#6a737d }
+/* NameVariable */ [data-theme="light"] .chroma .nv { color:#953800 }
+/* NameVariableClass */ [data-theme="light"] .chroma .vc { color:#953800 }
+/* NameVariableGlobal */ [data-theme="light"] .chroma .vg { color:#953800 }
+/* NameVariableInstance */ [data-theme="light"] .chroma .vi { color:#953800 }
+/* NameVariableMagic */ [data-theme="light"] .chroma .vm { color:#953800 }
+/* NameFunction */ [data-theme="light"] .chroma .nf { color:#6639ba }
+/* NameFunctionMagic */ [data-theme="light"] .chroma .fm { color:#6639ba }
+/* LiteralString */ [data-theme="light"] .chroma .s { color:#0a3069 }
+/* LiteralStringAffix */ [data-theme="light"] .chroma .sa { color:#0a3069 }
+/* LiteralStringBacktick */ [data-theme="light"] .chroma .sb { color:#0a3069 }
+/* LiteralStringChar */ [data-theme="light"] .chroma .sc { color:#0a3069 }
+/* LiteralStringDelimiter */ [data-theme="light"] .chroma .dl { color:#0a3069 }
+/* LiteralStringDoc */ [data-theme="light"] .chroma .sd { color:#0a3069 }
+/* LiteralStringDouble */ [data-theme="light"] .chroma .s2 { color:#0a3069 }
+/* LiteralStringEscape */ [data-theme="light"] .chroma .se { color:#0a3069 }
+/* LiteralStringHeredoc */ [data-theme="light"] .chroma .sh { color:#0a3069 }
+/* LiteralStringInterpol */ [data-theme="light"] .chroma .si { color:#0a3069 }
+/* LiteralStringOther */ [data-theme="light"] .chroma .sx { color:#0a3069 }
+/* LiteralStringRegex */ [data-theme="light"] .chroma .sr { color:#0a3069 }
+/* LiteralStringSingle */ [data-theme="light"] .chroma .s1 { color:#0a3069 }
+/* LiteralStringSymbol */ [data-theme="light"] .chroma .ss { color:#032f62 }
+/* LiteralNumber */ [data-theme="light"] .chroma .m { color:#0550ae }
+/* LiteralNumberBin */ [data-theme="light"] .chroma .mb { color:#0550ae }
+/* LiteralNumberFloat */ [data-theme="light"] .chroma .mf { color:#0550ae }
+/* LiteralNumberHex */ [data-theme="light"] .chroma .mh { color:#0550ae }
+/* LiteralNumberInteger */ [data-theme="light"] .chroma .mi { color:#0550ae }
+/* LiteralNumberIntegerLong */ [data-theme="light"] .chroma .il { color:#0550ae }
+/* LiteralNumberOct */ [data-theme="light"] .chroma .mo { color:#0550ae }
+/* Operator */ [data-theme="light"] .chroma .o { color:#0550ae }
+/* OperatorWord */ [data-theme="light"] .chroma .ow { color:#0550ae }
+/* Punctuation */ [data-theme="light"] .chroma .p { color:#1f2328 }
+/* Comment */ [data-theme="light"] .chroma .c { color:#57606a }
+/* CommentHashbang */ [data-theme="light"] .chroma .ch { color:#57606a }
+/* CommentMultiline */ [data-theme="light"] .chroma .cm { color:#57606a }
+/* CommentSingle */ [data-theme="light"] .chroma .c1 { color:#57606a }
+/* CommentSpecial */ [data-theme="light"] .chroma .cs { color:#57606a }
+/* CommentPreproc */ [data-theme="light"] .chroma .cp { color:#57606a }
+/* CommentPreprocFile */ [data-theme="light"] .chroma .cpf { color:#57606a }
+/* GenericDeleted */ [data-theme="light"] .chroma .gd { color:#82071e;background-color:#ffebe9 }
+/* GenericEmph */ [data-theme="light"] .chroma .ge { color:#1f2328 }
+/* GenericInserted */ [data-theme="light"] .chroma .gi { color:#116329;background-color:#dafbe1 }
+/* GenericOutput */ [data-theme="light"] .chroma .go { color:#1f2328 }
+/* GenericUnderline */ [data-theme="light"] .chroma .gl { text-decoration:underline }
+/* TextWhitespace */ [data-theme="light"] .chroma .w { color:#fff }

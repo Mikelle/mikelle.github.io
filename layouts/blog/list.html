@@ -1,6 +1,7 @@
 {{ define "main" }}
+<h1 class="sr-only">Blog</h1>
 <div class="cmd-line">
-    <span class="prompt">~$</span> <span class="command">ls</span> <span class="flag">-la</span> <span class="string">blog/</span>
+    <span class="prompt" aria-hidden="true">~$</span> <span class="command">ls</span> <span class="flag">-la</span> <span class="string">blog/</span>
 </div>
 
 {{ range .Pages }}

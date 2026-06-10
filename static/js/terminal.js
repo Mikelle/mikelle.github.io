@@ -1,4 +1,8 @@
 (function() {
+    function scrollBehavior() {
+        return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    }
+
     const commands = {
         'help': { action: 'help' },
         'whoami': { action: 'scroll', target: 'hero' },
@@ -162,7 +166,7 @@
             if (e.key === '/' && document.activeElement !== input) {
                 e.preventDefault();
                 input.focus();
-                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                input.scrollIntoView({ behavior: scrollBehavior(), block: 'center' });
             }
         });
     }
@@ -313,16 +317,6 @@
     }
 
     function scrollToSection(target) {
-        const sectionMap = {
-            'hero': '.section:first-of-type',
-            'about': '#about',
-            'experience': '#experience',
-            'projects': '#projects',
-            'blog': '.section:has(.command:contains("blog")), .section:nth-last-of-type(4)',
-            'notes': '.section:has(.command:contains("notes")), .section:nth-last-of-type(3)',
-            'contact': '#contact'
-        };
-
         let el = null;
 
         // Try ID first
@@ -347,7 +341,7 @@
         }
 
         if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            el.scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
         }
     }
 

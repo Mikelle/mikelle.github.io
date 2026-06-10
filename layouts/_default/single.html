@@ -1,10 +1,6 @@
 {{ define "main" }}
-<script>setTimeout(() => {
-    document.getElementById('particles-canvas')?.remove();
-    document.getElementById('matrix-canvas')?.remove();
-}, 150);</script>
 <div class="cmd-line">
-    <span class="prompt">~$</span> <span class="command">cat</span> <span class="string">{{ .File.BaseFileName }}.md</span>
+    <span class="prompt" aria-hidden="true">~$</span> <span class="command">cat</span> <span class="string">{{ .File.BaseFileName }}.md</span>
 </div>
 
 <article>

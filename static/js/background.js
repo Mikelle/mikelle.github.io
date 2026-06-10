@@ -2,6 +2,32 @@
 (function() {
     let matrixInterval = null;
     let particlesInterval = null;
+    let listenerCleanups = [];
+
+    // Read effect colors from the active theme; refresh when the theme changes
+    const colors = { bg: '#0d1117', green: '#3fb950' };
+
+    function refreshColors() {
+        const style = getComputedStyle(document.documentElement);
+        colors.bg = style.getPropertyValue('--bg').trim() || colors.bg;
+        colors.green = style.getPropertyValue('--green').trim() || colors.green;
+    }
+
+    function withAlpha(hex, alpha) {
+        const n = parseInt(hex.slice(1), 16);
+        return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+    }
+
+    refreshColors();
+    new MutationObserver(refreshColors).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme']
+    });
+
+    function addListener(target, event, handler) {
+        target.addEventListener(event, handler);
+        listenerCleanups.push(() => target.removeEventListener(event, handler));
+    }
 
     window.setBackground = function(type) {
         // Clear existing effects
@@ -28,6 +54,10 @@
         document.getElementById('matrix-canvas')?.remove();
         document.getElementById('particles-canvas')?.remove();
 
+        // Remove window listeners added by the previous effect
+        listenerCleanups.forEach(cleanup => cleanup());
+        listenerCleanups = [];
+
         // Clear intervals
         if (matrixInterval) {
             clearInterval(matrixInterval);
@@ -46,23 +76,25 @@
 
         const ctx = canvas.getContext('2d');
 
+        const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+        const fontSize = 14;
+        let columns = 0;
+        let drops = [];
+
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            columns = Math.floor(canvas.width / fontSize);
+            drops = Array(columns).fill(1);
         }
         resize();
-        window.addEventListener('resize', resize);
-
-        const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
-        const fontSize = 14;
-        const columns = Math.floor(canvas.width / fontSize);
-        const drops = Array(columns).fill(1);
+        addListener(window, 'resize', resize);
 
         function draw() {
-            ctx.fillStyle = 'rgba(13, 17, 23, 0.05)';
+            ctx.fillStyle = withAlpha(colors.bg, 0.05);
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = '#3fb950';
+            ctx.fillStyle = colors.green;
             ctx.font = fontSize + 'px monospace';
 
             for (let i = 0; i < drops.length; i++) {
@@ -94,14 +126,14 @@
             canvas.height = window.innerHeight;
         }
         resize();
-        window.addEventListener('resize', resize);
+        addListener(window, 'resize', resize);
 
-        window.addEventListener('mousemove', (e) => {
+        addListener(window, 'mousemove', (e) => {
             mouse.x = e.x;
             mouse.y = e.y;
         });
 
-        window.addEventListener('mouseout', () => {
+        addListener(window, 'mouseout', () => {
             mouse.x = null;
             mouse.y = null;
         });
@@ -151,12 +183,12 @@
 
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = '#3fb950';
+                ctx.fillStyle = colors.green;
                 ctx.fill();
             });
 
             // Draw connections between particles
-            ctx.strokeStyle = 'rgba(63, 185, 80, 0.2)';
+            ctx.strokeStyle = withAlpha(colors.green, 0.2);
             ctx.lineWidth = 1;
 
             for (let i = 0; i < particles.length; i++) {
@@ -176,7 +208,7 @@
 
             // Draw connections from mouse to nearby particles
             if (mouse.x !== null && mouse.y !== null) {
-                ctx.strokeStyle = 'rgba(63, 185, 80, 0.4)';
+                ctx.strokeStyle = withAlpha(colors.green, 0.4);
                 particles.forEach(p => {
                     const dx = mouse.x - p.x;
                     const dy = mouse.y - p.y;
@@ -209,6 +241,6 @@
     const saved = localStorage.getItem('bg');
     const bg = saved !== null ? saved : 'particles';
     if (bg && bg !== 'none') {
-        setTimeout(() => setBackground(bg), 100);
+        setBackground(bg);
     }
 })();
