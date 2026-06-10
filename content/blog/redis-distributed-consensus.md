@@ -33,6 +33,7 @@ A single-node consensus layer ([Part 2](/blog/single-node-consensus)) works unti
                                 |
          +----------------------+----------------------+
          |                      |                      |
+         |                      |                      |
          v                      v                      v
   +-------------+        +-------------+        +-------------+
   | Member 1    |        | Member 2    |        | Member 3    |

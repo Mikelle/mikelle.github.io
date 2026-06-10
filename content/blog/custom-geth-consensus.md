@@ -27,6 +27,7 @@ The [mev-commit](https://github.com/primev/mev-commit) project uses custom conse
 |                Your Application                 |
 +-------------------------------------------------+
                          |
+                         |
                          v
 +-------------------------------------------------+
 |             Custom Consensus Layer              |
@@ -210,6 +211,7 @@ Building a block is two-phase:
 | 4. Validate ExecutionPayload      |
 |    height, parent, timestamp      |
 +-----------------------------------+
+        |
         |
         v
 +-----------------------------------+

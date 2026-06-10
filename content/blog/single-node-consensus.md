@@ -32,6 +32,7 @@ The application has four main components:
 |   | BlockBuilder |  | StateManager |  | HealthServer |   |
 |   +--------------+  +--------------+  +--------------+   |
 |          |                 |                             |
+|          |                 |                             |
 |          v                 v                             |
 |   +--------------------------------------------------+   |
 |   |                    Run Loop                      |   |

@@ -64,6 +64,7 @@ CometBFT uses a three-phase commit protocol. A designated proposer builds a bloc
 ```goat
                       Height H
                           |
+                          |
                           v
 +--------------------------------------------------+
 | PROPOSE  (proposer calls PrepareProposal)        |
@@ -72,6 +73,7 @@ CometBFT uses a three-phase commit protocol. A designated proposer builds a bloc
 | 3. GetPayloadV5 (retrieve built block)           |
 | 4. Wrap payload as CometBFT transaction          |
 +--------------------------------------------------+
+                          |
                           |
                           v
 +--------------------------------------------------+
@@ -82,12 +84,14 @@ CometBFT uses a three-phase commit protocol. A designated proposer builds a bloc
 | - Vote ACCEPT or REJECT                          |
 +--------------------------------------------------+
                           |
+                          |
                           v
 +--------------------------------------------------+
 | PRECOMMIT  (commit if >2/3 prevoted)             |
 | - Sign precommit message                         |
 | - Broadcast to network                           |
 +--------------------------------------------------+
+                          |
                           |
                           v
 +--------------------------------------------------+
@@ -97,6 +101,7 @@ CometBFT uses a three-phase commit protocol. A designated proposer builds a bloc
 | 3. Save execution head to Badger DB              |
 | 4. Block is FINAL, no reorgs possible            |
 +--------------------------------------------------+
+                          |
                           |
                           v
                       Height H+1
