@@ -5,7 +5,7 @@
 
 <article>
     <div class="article-header">
-        <div class="article-meta">{{ .Date.Format "2006.01.02" }}{{ with .Params.tags }} · {{ range $i, $t := . }}{{ if $i }}, {{ end }}#{{ $t }}{{ end }}{{ end }}</div>
+        <div class="article-meta">{{ .Date.Format "2006.01.02" }}{{ if eq .Section "blog" }} · {{ .ReadingTime }} min{{ end }}{{ with .Params.tags }} · {{ range $i, $t := . }}{{ if $i }}, {{ end }}#{{ $t }}{{ end }}{{ end }}</div>
         <h1 class="article-title">{{ .Title }}</h1>
     </div>
     <div class="article-body">
