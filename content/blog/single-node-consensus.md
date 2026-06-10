@@ -18,7 +18,7 @@ A single-node consensus layer that:
 - Handles transient failures with exponential backoff
 - Exposes health checks for orchestration
 - Supports graceful shutdown
-- Provides Prometheus metrics
+- Exposes a Prometheus metrics endpoint
 
 ## Application Structure
 
@@ -61,7 +61,7 @@ Sensible defaults:
 
 | Parameter | Default | Purpose |
 |-----------|---------|---------|
-| `EVMBuildDelay` | 1ms | Time for Geth to include transactions |
+| `EVMBuildDelay` | 100ms | Time for Geth to include transactions |
 | `EVMBuildDelayEmptyBlocks` | 1min | Avoid spamming empty blocks |
 | `TxPoolPollingInterval` | 5ms | Check for new transactions |
 
@@ -211,7 +211,11 @@ func (bb *BlockBuilder) GetPayload(ctx context.Context) error {
 
     // Don't finalize empty blocks
     if len(payloadResp.ExecutionPayload.Transactions) == 0 {
-        time.Sleep(bb.buildEmptyBlocksDelay)
+        select {
+        case <-ctx.Done():
+            return ctx.Err()
+        case <-time.After(bb.buildEmptyBlocksDelay):
+        }
         return ErrEmptyBlock
     }
 
@@ -230,7 +234,7 @@ func (bb *BlockBuilder) GetPayload(ctx context.Context) error {
 
 ### Phase 2: Finalizing a Block
 
-`FinalizeBlock` deserializes the payload from state, validates it, submits it to Geth via `NewPayloadV4`, then updates the fork choice to make it canonical.
+`FinalizeBlock` deserializes the payload from state, validates it, submits it to Geth via `NewPayloadV4`, then updates the fork choice to make it canonical. The deserialized requests are plain `[][]byte`; the engine client converts them to `hexutil.Bytes` at the RPC boundary, as shown in [Part 1](/blog/custom-geth-consensus).
 
 ```go
 func (bb *BlockBuilder) FinalizeBlock(
@@ -252,6 +256,7 @@ func (bb *BlockBuilder) FinalizeBlock(
     }
 
     // Submit block to Geth
+    // parentBeaconBlockRoot: we set BeaconRoot to the parent hash in the payload attributes
     parentHash := common.BytesToHash(bb.executionHead.BlockHash)
     err := retryWithBackoff(ctx, maxAttempts, bb.logger, func() error {
         status, err := bb.engineCl.NewPayloadV4(ctx, payload,
@@ -303,15 +308,15 @@ Wire everything together:
 
 ```go
 type SingleNodeApp struct {
-    logger           *slog.Logger
-    cfg              Config
-    blockBuilder     *BlockBuilder
-    stateManager     *state.LocalStateManager
-    appCtx           context.Context
-    cancel           context.CancelFunc
-    wg               sync.WaitGroup
-    connectionRefused bool
-    runLoopStopped   chan struct{}
+    logger            *slog.Logger
+    cfg               Config
+    blockBuilder      *BlockBuilder
+    stateManager      *state.LocalStateManager
+    appCtx            context.Context
+    cancel            context.CancelFunc
+    wg                sync.WaitGroup
+    connectionRefused atomic.Bool
+    runLoopStopped    chan struct{}
 }
 
 func NewSingleNodeApp(
@@ -365,7 +370,7 @@ func (app *SingleNodeApp) healthHandler(w http.ResponseWriter, r *http.Request) 
     }
 
     // Check if Geth is reachable
-    if app.connectionRefused {
+    if app.connectionRefused.Load() {
         http.Error(w, "ethereum unavailable", http.StatusServiceUnavailable)
         return
     }
@@ -383,16 +388,16 @@ func (app *SingleNodeApp) healthHandler(w http.ResponseWriter, r *http.Request) 
 }
 ```
 
-Track connection status:
+Track connection status. The field is an `atomic.Bool` because the run loop writes it while the health handler reads it from another goroutine:
 
 ```go
 func (app *SingleNodeApp) setConnectionStatus(err error) {
     if err == nil {
-        app.connectionRefused = false
+        app.connectionRefused.Store(false)
         return
     }
     if strings.Contains(err.Error(), "connection refused") {
-        app.connectionRefused = true
+        app.connectionRefused.Store(true)
         app.logger.Warn("Geth connection refused")
     }
 }

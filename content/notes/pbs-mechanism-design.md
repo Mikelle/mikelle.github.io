@@ -2,6 +2,7 @@
 title: "PBS mechanism design rabbit hole"
 date: 2025-01-09
 draft: true
+description: "Who captures MEV and how it flows back to users. PBS tradeoffs are real."
 tags: ["MEV", "PBS"]
 ---
 

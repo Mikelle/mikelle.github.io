@@ -2,6 +2,7 @@
 title: "zkEVM reorg handling is brutal"
 date: 2024-12-15
 draft: true
+description: "L1 reorgs force the sequencer to unwind state. Edge cases everywhere."
 tags: ["zkEVM", "sequencer"]
 ---
 

@@ -63,6 +63,8 @@ docker compose up geth
 
 This starts Geth with the Engine API on port 8551 and HTTP RPC on 8545. The setup uses a custom [`genesis.json`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/genesis.json) for the private chain. See [`docker-compose.yml`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/docker-compose.yml) and [`geth-entrypoint.sh`](https://github.com/mikelle/geth-consensus-tutorial/blob/main/geth-entrypoint.sh) for the full configuration.
 
+The genesis also matters for Engine API versioning. This series pairs `engine_getPayloadV5` and `engine_newPayloadV4` with `engine_forkchoiceUpdatedV3`, and Geth only accepts those method versions when the genesis enables the matching fork timestamps (Prague/Osaka). The repo's `genesis.json` sets these; without them, Geth rejects the calls with an "Unsupported fork" error.
+
 One important flag: `--miner.gasprice 1`. Geth's miner filters transactions whose effective tip is below this threshold during block building. The default (1 Mwei) silently drops transactions with low priority fees. This is a common gotcha on private chains where tools like `cast` default to minimal fees.
 
 Once Geth is running, start the consensus client from the repo:
@@ -291,6 +293,7 @@ func (bb *BlockBuilder) FinalizeBlock(ctx context.Context,
     }
 
     // Submit to Geth
+    // parentBeaconBlockRoot: we set BeaconRoot to the parent hash in the payload attributes
     parentHash := common.BytesToHash(bb.executionHead.BlockHash)
     status, _ := bb.engineCl.NewPayloadV4(ctx, *payload, []common.Hash{}, &parentHash, requests)
     if status.Status == engine.INVALID {
@@ -343,6 +346,8 @@ type BlockBuildState struct {
     ExecutionPayload string // Base64-encoded
 }
 ```
+
+Part 1 doesn't use this struct yet. In [Part 2](/blog/single-node-consensus), the run loop uses it to persist state between the build and finalize phases.
 
 State machine:
 

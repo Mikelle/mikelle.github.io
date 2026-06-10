@@ -8,7 +8,7 @@ tags: ["consensus", "geth", "redis", "postgres", "tutorial"]
 
 *Part 3 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
 
-A single-node consensus layer ([Part 2](/blog/single-node-consensus)) works until the node dies. This article adds Redis-based leader election for failover, PostgreSQL for durable payload storage, and member nodes that sync blocks from the leader and execute them on their own Geth instance, making each member a full execution replica. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/03-member-nodes).
+A single-node consensus layer ([Part 2](/blog/single-node-consensus)) works until the node dies. This article adds Redis-based leader election for failover, PostgreSQL for durable payload storage, and member nodes that sync blocks from the leader and execute them on their own Geth instance, so each member holds a complete copy of the chain. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/03-member-nodes).
 
 ## What We're Building
 
@@ -296,7 +296,7 @@ if bb.redisClient != nil {
 }
 ```
 
-The local head is updated first so the next block builds from the right point even if storage fails. PostgreSQL and Redis failures return hard errors. If either fails, the operator knows the block didn't reach members. The Redis stream is for real-time notification.
+The local head is updated first so the next block builds from the right point even if storage fails. PostgreSQL and Redis failures return hard errors. If either fails, the operator knows the block didn't reach members. The Redis stream is a real-time notification channel that members could subscribe to instead of polling the HTTP API; in this part it's groundwork only, and no consumer is wired up.
 
 ## HTTP API for Member Sync
 
@@ -355,6 +355,8 @@ type ExecutionEngine interface {
 }
 ```
 
+The interface declares `requests [][]byte`; the engine client converts these to `hexutil.Bytes` at the RPC boundary, as shown in [Part 1](/blog/custom-geth-consensus).
+
 For each fetched block, `executeBlock` deserializes the payload and requests, then replays the same Engine API calls the leader made: `NewPayloadV4` to push the block, `ForkchoiceUpdatedV3` to set the head.
 
 ```go
@@ -382,6 +384,7 @@ func (s *Syncer) executeBlock(ctx context.Context, block *BlockResponse) error {
     }
 
     // Push to Geth
+    // parentBeaconBlockRoot: the leader set BeaconRoot to the parent hash in the payload attributes
     parentHash := common.HexToHash(block.ParentHash)
     status, err := s.engine.NewPayloadV4(ctx, execPayload, []common.Hash{}, &parentHash, requests)
     if err != nil {
@@ -527,14 +530,16 @@ curl localhost:8081/health  # OK (mode=member, lastSynced=1, totalSynced=1)
 ```bash
 # Kill the leader (Ctrl+C)
 # Wait up to 5s for TTL to expire
-# A standby leader node (if running) acquires the lock and resumes block production
+# A synced standby (if running) acquires the lock and resumes block production
 ```
+
+One caveat: a standby that only waits on the lock never executes blocks, so its Geth would be stale at takeover and it would build on an old head, forking the chain. A standby must also run the member syncer while waiting, so its Geth tracks the leader's head. When it acquires the lock, it stops syncing and starts producing from an up-to-date head.
 
 ## Failure Scenarios
 
 | Scenario | Behavior |
 |----------|----------|
-| Leader crashes | Lock expires (5s TTL), standby acquires |
+| Leader crashes | Lock expires (5s TTL), synced standby acquires |
 | Leader shuts down gracefully | Lock deleted immediately, instant failover |
 | Member loses leader connection | Exponential backoff (200ms–30s), catches up when reconnected |
 | PostgreSQL unavailable | Leader returns error, block finalized on Geth but not stored |
@@ -542,7 +547,7 @@ curl localhost:8081/health  # OK (mode=member, lastSynced=1, totalSynced=1)
 
 ## What's Next
 
-We now have a distributed consensus system with leader election, durable storage, and horizontally scalable member nodes that are full execution replicas. In **[Part 4: CometBFT Integration](/blog/cometbft-geth-consensus)**, we replace the custom leader election with BFT consensus, where multiple validators agree on each block through voting rounds and reach instant finality.
+We now have a distributed consensus system with leader election, durable storage, and horizontally scalable member nodes that each maintain their own copy of the chain. In **[Part 4: CometBFT Integration](/blog/cometbft-geth-consensus)**, we replace the custom leader election with BFT consensus, where multiple validators agree on each block through voting rounds and reach instant finality.
 
 ---
 

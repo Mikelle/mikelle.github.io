@@ -135,6 +135,8 @@ type MsgExecutionPayload struct {
 }
 ```
 
+The interface declares `requests [][]byte`; the engine client adapter converts these to `hexutil.Bytes` at the RPC boundary, as shown in [Part 1](/blog/custom-geth-consensus).
+
 The `GethConsensusApp` struct holds a Badger DB for state persistence, the Engine API client, and a cached execution head:
 
 ```go
@@ -149,7 +151,7 @@ type GethConsensusApp struct {
 
 ## PrepareProposal: Building Blocks
 
-When CometBFT selects this node as the round's proposer, it calls `PrepareProposal`. We trigger Geth to build a block via `ForkchoiceUpdatedV3` with payload attributes, wait for transactions to be included, then retrieve the built payload with `GetPayloadV5`:
+When CometBFT selects this node as the round's proposer, it calls `PrepareProposal`. We trigger Geth to build a block via `ForkchoiceUpdatedV3` with payload attributes, wait for transactions to be included (300ms here, longer than Part 2's 100ms to give more headroom in a multi-node Docker setup), then retrieve the built payload with `GetPayloadV5`:
 
 ```go
 func (app *GethConsensusApp) buildBlock(ctx context.Context,
@@ -556,6 +558,23 @@ time=... level=INFO msg="PrepareProposal called" height=2
 
 Each line of output traces the consensus flow: the proposer builds a block (`PrepareProposal`), all validators validate it (`ProcessProposal`), and then everyone executes it (`FinalizeBlock`).
 
+### Sending a Transaction
+
+The blocks above are empty (`txCount=0`). Send a transaction to see one included (using [Foundry's `cast`](https://book.getfoundry.sh/cast/)):
+
+```bash
+cast send --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 \
+    --rpc-url http://localhost:8545 \
+    --value 1wei 0x0000000000000000000000000000000000000001
+```
+
+The next proposal picks it up:
+
+```text
+time=... level=INFO msg="Prepared proposal" blockNumber=12 blockHash=0x... txCount=1
+time=... level=INFO msg="Block finalized" height=12 hash=0x...
+```
+
 ### Multi-Validator Setup
 
 The above runs a single validator. To test BFT consensus, you need at least four validators (tolerating one Byzantine fault, since n >= 3f+1). Each validator gets its own CometBFT home directory, its own Geth instance, and a shared genesis that lists all validator public keys.
@@ -647,10 +666,12 @@ go run ./cmd/main.go --cmt-home ~/.cometbft-node3 --eth-client-url http://localh
 
 CometBFT handles peer discovery, proposer rotation, and vote aggregation automatically. No changes to the ABCI application code are needed.
 
+One thing to watch: the four Geth containers have isolated mempools, and proposers rotate every block. A transaction sent to one Geth's RPC only lands in a block when *that* node is the proposer, which means delays of several rounds. Two fixes: peer the Geth instances over devp2p so transactions gossip between mempools, or forward incoming transactions to all four RPC endpoints.
+
 ## What's Next
 
 From here, two CometBFT features are worth exploring: **[vote extensions](https://docs.cometbft.com/v0.38/spec/abci/abci++_app_requirements#vote-extensions)**, which embed extra data in consensus votes, and **[state sync](https://docs.cometbft.com/v0.38/core/state-sync)**, which bootstraps new nodes quickly.
 
 ---
 
-*Full source code: [geth-consensus-tutorial](https://github.com/mikelle/geth-consensus-tutorial/tree/main/04-cometbft-consensus)*
+*Full source code: [geth-consensus-tutorial](https://github.com/mikelle/geth-consensus-tutorial/tree/main/04-cometbft-consensus) | Based on [mev-commit consensus layer](https://github.com/primev/mev-commit/tree/main/cl)*
