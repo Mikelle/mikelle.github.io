@@ -354,9 +354,9 @@ Part 1 doesn't use this struct yet. In [Part 2](/blog/single-node-consensus), th
 State machine:
 
 ```goat
-+----------------+
-| StepBuildBlock |
-+----------------+
++-------------------+
+|  StepBuildBlock   |
++-------------------+
     |              ^
     | GetPayload() |
     |              | FinalizeBlock()
