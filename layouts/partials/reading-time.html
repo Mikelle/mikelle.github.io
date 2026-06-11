@@ -1,0 +1,4 @@
+{{- $prose := replaceRE "(?s)```.*?```" "" .RawContent -}}
+{{- $mins := int (math.Ceil (div (float (countwords $prose)) 213.0)) -}}
+{{- if lt $mins 1 }}{{ $mins = 1 }}{{ end -}}
+{{- $mins -}}

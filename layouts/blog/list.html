@@ -6,7 +6,7 @@
 
 {{ range .Pages }}
 <div class="article-item">
-    <div class="article-status">[{{ if .Draft }}draft{{ else }}{{ .Date.Format "2006.01.02" }}{{ end }} · {{ .ReadingTime }} min]</div>
+    <div class="article-status">[{{ if .Draft }}draft{{ else }}{{ .Date.Format "2006.01.02" }}{{ end }} · {{ partial "reading-time.html" . }} min]</div>
     <div class="article-title"><a href="{{ .Permalink }}">{{ .Title }}</a></div>
     {{ with .Description }}<div class="article-desc">{{ . }}</div>{{ end }}
     {{ with .Params.tags }}
