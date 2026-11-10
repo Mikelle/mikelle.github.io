@@ -2,13 +2,13 @@
 title: "Single Node Consensus: Building a Complete Implementation"
 date: 2026-02-08
 draft: false
-description: "Building a production-ready single-node consensus layer with retry logic, health checks, graceful shutdown, and metrics."
+description: "Turning raw Engine API calls into a long-running single-node consensus service with retries, health checks, graceful shutdown, and metrics."
 tags: ["consensus", "geth", "tutorial"]
 ---
 
 *Part 2 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
 
-[Part 1](/blog/custom-geth-consensus) left us with raw Engine API calls that build and finalize a single block. This part wraps those calls into a production-ready application with retry logic, health checks, and graceful shutdown. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/02-single-node).
+[Part 1](/blog/custom-geth-consensus) left us with raw Engine API calls that build and finalize a single block. This part wraps those calls in an application that keeps producing blocks on its own: it retries failed calls, reports its health, and shuts down cleanly. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/02-single-node).
 
 ## What We're Building
 
@@ -43,7 +43,7 @@ The application has four main components:
 
 ## Configuration
 
-Define all configurable parameters:
+Everything tunable lives in one struct:
 
 ```go
 type Config struct {
@@ -58,7 +58,7 @@ type Config struct {
 }
 ```
 
-Sensible defaults:
+The timing parameters and their defaults:
 
 | Parameter | Default | Purpose |
 |-----------|---------|---------|
@@ -305,7 +305,7 @@ func (bb *BlockBuilder) FinalizeBlock(
 
 ## The Main Application
 
-Wire everything together:
+`NewSingleNodeApp` decodes the JWT secret, creates the Engine API client, and passes it to the block builder along with the state manager:
 
 ```go
 type SingleNodeApp struct {
@@ -360,7 +360,7 @@ func NewSingleNodeApp(
 
 ## Health Checks
 
-Essential for Kubernetes/orchestration:
+The `/health` endpoint returns 503 when the app is shutting down, Geth is refusing connections, or the run loop has exited. Kubernetes or another orchestrator can use it as a liveness probe and restart the process:
 
 ```go
 func (app *SingleNodeApp) healthHandler(w http.ResponseWriter, r *http.Request) {
@@ -406,7 +406,7 @@ func (app *SingleNodeApp) setConnectionStatus(err error) {
 
 ## The Run Loop
 
-Block production runs here:
+`Start` launches two goroutines, the health server and the run loop. Each loop iteration builds and finalizes one block. When there is nothing to include, the loop sleeps for `TxPoolPollingInterval` and polls again:
 
 ```go
 func (app *SingleNodeApp) Start() {
@@ -480,7 +480,7 @@ func (app *SingleNodeApp) produceBlock() error {
 
 ## Graceful Shutdown
 
-Handle SIGTERM/SIGINT properly:
+`Stop` cancels the app context, which shuts down the health server and ends the run loop, then waits up to 5 seconds for both goroutines to exit:
 
 ```go
 func (app *SingleNodeApp) Stop() {
@@ -571,7 +571,7 @@ Scrape `http://localhost:8080/metrics` to monitor your consensus layer.
 
 ## What's Next
 
-We now have a production-ready single-node consensus, but a single node is also a single point of failure: when it dies, block production stops. **[Part 3: Distributed Consensus with Redis, PostgreSQL, and Member Nodes](/blog/redis-distributed-consensus)** adds:
+We now have a node that produces blocks on its own and rides out Geth restarts, but it is still a single point of failure: when it dies, block production stops. **[Part 3: Distributed Consensus with Redis, PostgreSQL, and Member Nodes](/blog/redis-distributed-consensus)** adds:
 
 - Leader election with Redis
 - Durable payload storage in PostgreSQL

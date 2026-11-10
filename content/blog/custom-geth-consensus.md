@@ -10,15 +10,13 @@ tags: ["consensus", "geth", "tutorial"]
 
 When Ethereum moved to Proof of Stake, Geth introduced the Engine API to split the execution layer from the consensus layer. It was built for beacon chain clients, but nothing stops you from putting your own consensus logic on the other end.
 
-This series does exactly that. It starts with raw Engine API calls and ends with a distributed, fault-tolerant system. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial).
+This series puts it there, starting with raw Engine API calls and ending with a distributed, fault-tolerant system. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial).
 
 ## Why Build Custom Consensus?
 
-- **Layer 2 chains**: Sequencers for rollups or app-specific chains
-- **Private networks**: Permissioned chains with custom block production
-- **Research**: Experimenting with new consensus mechanisms
+Rollups and app-specific chains need a sequencer that decides who produces blocks and when. Permissioned networks want block production they control. Researchers want to try a new consensus mechanism without forking an execution client. In each case, the Engine API lets you write only the consensus part and leave execution to Geth.
 
-The [mev-commit](https://github.com/primev/mev-commit) project uses custom consensus to enable preconfirmations.
+[mev-commit](https://github.com/primev/mev-commit) is one example: it uses custom consensus to enable preconfirmations.
 
 ## Architecture Overview
 

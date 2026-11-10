@@ -2,13 +2,13 @@
 title: "CometBFT Integration: BFT Finality for Geth"
 date: 2026-03-04
 draft: false
-description: "Replacing custom leader election with CometBFT for Byzantine fault tolerance, multi-validator voting, and instant finality."
+description: "Replacing Redis leader election with CometBFT, so validators vote on every block and a malicious proposer can't finalize an invalid one."
 tags: ["consensus", "geth", "cometbft", "tutorial"]
 ---
 
 *Part 4 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
 
-The Redis-based system from [Part 3](/blog/redis-distributed-consensus) tolerates crashes: if the leader dies, a standby takes over. But it can't handle a *malicious* leader that proposes invalid blocks. This article replaces the entire custom stack with [CometBFT](https://cometbft.com/) (formerly Tendermint), giving us Byzantine fault tolerance, multi-validator voting, and instant finality. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/04-cometbft-consensus).
+The Redis-based system from [Part 3](/blog/redis-distributed-consensus) tolerates crashes: if the leader dies, a standby takes over. But it can't handle a *malicious* leader that proposes invalid blocks. This article replaces the entire custom stack with [CometBFT](https://cometbft.com/) (formerly Tendermint), Every block now needs votes from more than two thirds of the validators before it commits, so the chain stays safe as long as fewer than a third of them are malicious, and a committed block is final immediately. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/04-cometbft-consensus).
 
 ## What We're Building
 
@@ -46,7 +46,7 @@ Each validator runs a CometBFT node paired with a Geth instance. CometBFT handle
 +------------------------------------------------------------+
 ```
 
-This mirrors Ethereum's post-merge architecture: separate consensus and execution layers connected by the Engine API. The difference: CometBFT replaces the Beacon Chain, running BFT consensus over a configurable validator set.
+This mirrors Ethereum's post-merge architecture: separate consensus and execution layers connected by the Engine API. Here CometBFT takes the Beacon Chain's place and runs BFT consensus over a validator set you configure.
 
 ### Redis Consensus vs CometBFT
 
@@ -675,7 +675,7 @@ One thing to watch: the four Geth containers have isolated mempools, and propose
 
 ## What's Next
 
-From here, two CometBFT features are worth exploring: **[vote extensions](https://docs.cometbft.com/v0.38/spec/abci/abci++_app_requirements#vote-extensions)**, which embed extra data in consensus votes, and **[state sync](https://docs.cometbft.com/v0.38/core/state-sync)**, which bootstraps new nodes quickly.
+To go further, look at two CometBFT features: **[vote extensions](https://docs.cometbft.com/v0.38/spec/abci/abci++_app_requirements#vote-extensions)**, which embed extra data in consensus votes, and **[state sync](https://docs.cometbft.com/v0.38/core/state-sync)**, which bootstraps new nodes quickly.
 
 ---
 
