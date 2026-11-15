@@ -4,9 +4,8 @@ date: 2026-02-08
 draft: false
 description: "Turning raw Engine API calls into a long-running single-node consensus service with retries, health checks, graceful shutdown, and metrics."
 tags: ["consensus", "geth", "tutorial"]
+series: "Custom Geth Consensus"
 ---
-
-*Part 2 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
 
 [Part 1](/blog/custom-geth-consensus) left us with raw Engine API calls that build and finalize a single block. This part wraps those calls in an application that keeps producing blocks on its own: it retries failed calls, reports its health, and shuts down cleanly. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/02-single-node).
 

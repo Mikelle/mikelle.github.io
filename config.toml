@@ -5,7 +5,7 @@ title = "Mikhail Wall"
 disableKinds = ["taxonomy", "term"]
 
 [params]
-  description = "Protocol Engineer. L2, MEV, DeFi infrastructure."
+  description = "Protocol Engineer. Ten years building crypto infrastructure."
   author = "Mikhail Wall"
   email = "mikhwall@gmail.com"
   github = "Mikelle"

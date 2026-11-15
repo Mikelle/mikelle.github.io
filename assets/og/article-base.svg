@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" font-family="'IBM Plex Mono', monospace">
+  <!-- Source for article-base.png, the background of per-article social cards.
+       Hugo draws the file name and the title on top (layouts/partials/og-image.html). -->
+  <rect width="1200" height="630" fill="#0d1117"/>
+
+  <!-- Terminal window -->
+  <rect x="60" y="60" width="1080" height="510" rx="12" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <line x1="60" y1="100" x2="1140" y2="100" stroke="#30363d" stroke-width="1"/>
+  <circle cx="90" cy="80" r="7" fill="#f85149"/>
+  <circle cx="115" cy="80" r="7" fill="#d29922"/>
+  <circle cx="140" cy="80" r="7" fill="#3fb950"/>
+  <text x="180" y="86" font-size="16" fill="#6e7681">mikhail@wall:~/blog</text>
+
+  <!-- Prompt; the file name follows at x=191 -->
+  <text x="90" y="150" font-size="24" fill="#3fb950">~$</text>
+  <text x="133" y="150" font-size="24" fill="#c9d1d9">cat</text>
+
+  <!-- Byline -->
+  <text x="90" y="532" font-size="20" font-weight="700" fill="#c9d1d9">Mikhail Wall</text>
+  <text x="1110" y="532" font-size="18" fill="#6e7681" text-anchor="end">mikelle.github.io</text>
+</svg>

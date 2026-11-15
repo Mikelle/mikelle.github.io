@@ -18,6 +18,8 @@
     <link rel="alternate" type="application/rss+xml" title="Mikhail Wall" href="{{ .Permalink }}">
     {{ end }}
 
+    {{- $ogImage := partial "og-image.html" . }}
+
     <!-- Meta -->
     <meta name="description" content="{{ .Description | default (.Summary | plainify | truncate 160) | default .Site.Params.description }}">
     <meta name="author" content="Mikhail Wall">
@@ -51,7 +53,7 @@
       },
       "datePublished": "{{ .Date.Format "2006-01-02" }}",
       {{ if .Lastmod }}"dateModified": "{{ .Lastmod.Format "2006-01-02" }}",{{ end }}
-      "image": "{{ "og-image.png" | absURL }}",
+      "image": "{{ $ogImage }}",
       "mainEntityOfPage": "{{ .Permalink }}",
       "url": "{{ .Permalink }}"
     }
@@ -60,24 +62,22 @@
 
     <!-- Open Graph -->
     <meta property="og:title" content="{{ if .IsHome }}Mikhail Wall - Protocol Engineer{{ else }}{{ .Title }} | Mikhail Wall{{ end }}">
-    <meta property="og:description" content="{{ if .Description }}{{ .Description }}{{ else }}Protocol Engineer. L2, MEV, DeFi infrastructure.{{ end }}">
+    <meta property="og:description" content="{{ .Description | default .Site.Params.description }}">
     <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
     <meta property="og:url" content="{{ .Permalink }}">
-    <meta property="og:image" content="{{ "og-image.png" | absURL }}">
+    <meta property="og:image" content="{{ $ogImage }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Mikhail Wall - Protocol Engineer">
+    <meta property="og:image:alt" content="{{ if .IsPage }}{{ .Title }}{{ else }}Mikhail Wall - Protocol Engineer{{ end }}">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@mikhwall">
     <meta name="twitter:title" content="{{ if .IsHome }}Mikhail Wall - Protocol Engineer{{ else }}{{ .Title }}{{ end }}">
-    <meta name="twitter:description" content="{{ if .Description }}{{ .Description }}{{ else }}Protocol Engineer. L2, MEV, DeFi infrastructure.{{ end }}">
-    <meta name="twitter:image" content="{{ "og-image.png" | absURL }}">
+    <meta name="twitter:description" content="{{ .Description | default .Site.Params.description }}">
+    <meta name="twitter:image" content="{{ $ogImage }}">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="preload" href="{{ "fonts/ibm-plex-mono-latin-400.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
     <script src="{{ "js/theme.js" | relURL }}"></script>
     {{ if not .IsPage }}

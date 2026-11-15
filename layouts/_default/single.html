@@ -1,4 +1,9 @@
 {{ define "main" }}
+{{- /* Posts sharing a `series` front matter value are linked in date order */ -}}
+{{- $series := slice -}}
+{{- with .Params.series }}{{ $series = (where (where $.Site.RegularPages "Section" $.Section) "Params.series" .).ByDate }}{{ end -}}
+{{- $idx := 0 -}}
+{{- range $i, $p := $series }}{{ if eq $p $ }}{{ $idx = $i }}{{ end }}{{ end -}}
 <div class="cmd-line">
     <span class="prompt" aria-hidden="true">~$</span> <span class="command">cat</span> <span class="string">{{ .File.BaseFileName }}.md</span>
 </div>
@@ -8,6 +13,18 @@
         <div class="article-meta">{{ .Date.Format "2006.01.02" }}{{ if eq .Section "blog" }} · {{ partial "reading-time.html" . }} min{{ end }}{{ with .Params.tags }} · {{ range $i, $t := . }}{{ if $i }}, {{ end }}#{{ $t }}{{ end }}{{ end }}</div>
         <h1 class="article-title">{{ .Title }}</h1>
     </div>
+    {{ if gt (len $series) 1 }}
+    <nav class="series" aria-label="Series">
+        <div class="comment"># series: {{ .Params.series }} · part {{ add $idx 1 }} of {{ len $series }}</div>
+        <ol>
+            {{ range $series }}
+            {{ if eq . $ }}<li class="current" aria-current="page">{{ .Title }}</li>
+            {{ else }}<li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+            {{ end }}
+            {{ end }}
+        </ol>
+    </nav>
+    {{ end }}
     {{ if and (eq .Section "blog") (findRE "<li" .TableOfContents 1) }}
     <details class="toc">
         <summary><span class="comment"># table of contents</span></summary>
@@ -20,6 +37,16 @@
 </article>
 
 <div class="article-footer">
+    {{ if gt (len $series) 1 }}
+    <nav class="series-nav" aria-label="Previous and next part">
+        {{ if gt $idx 0 }}{{ with index $series (sub $idx 1) }}
+        <a class="series-prev" href="{{ .RelPermalink }}"><span class="comment">← part {{ $idx }}</span>{{ .Title }}</a>
+        {{ end }}{{ end }}
+        {{ if lt (add $idx 1) (len $series) }}{{ with index $series (add $idx 1) }}
+        <a class="series-next" href="{{ .RelPermalink }}"><span class="comment">part {{ add $idx 2 }} →</span>{{ .Title }}</a>
+        {{ end }}{{ end }}
+    </nav>
+    {{ end }}
     <a href="/{{ .Section }}/">← back to {{ .Section }}</a>
 </div>
 

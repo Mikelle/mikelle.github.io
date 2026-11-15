@@ -1,3 +1,6 @@
 <footer class="footer">
     <span class="comment">/* © {{ now.Year }} Mikhail Wall */</span>
+    {{- with .Site.Home.OutputFormats.Get "RSS" }}
+    <span aria-hidden="true">·</span> <a href="{{ .RelPermalink }}">rss</a>
+    {{- end }}
 </footer>

@@ -1,0 +1,21 @@
+{{- /*
+  Returns the absolute URL of a page's social preview image.
+  Articles and notes get a card generated at build time with their own title
+  (drawn onto assets/og/article-base.png); every other page uses the static site card.
+*/ -}}
+{{- $url := "og-image.png" | absURL -}}
+{{- if and .IsPage .File -}}
+  {{- $base := resources.Get "og/article-base.png" -}}
+  {{- $layer := resources.Get "og/text-layer.png" -}}
+  {{- $bold := resources.Get "fonts/IBMPlexMono-Bold.ttf" -}}
+  {{- $regular := resources.Get "fonts/IBMPlexMono-Regular.ttf" -}}
+  {{- if and $base $layer $bold $regular -}}
+    {{- /* The title is drawn on a transparent layer so it wraps at the layer's width */ -}}
+    {{- $title := $layer.Filter (images.Text .Title (dict "color" "#e6edf3" "size" 52 "linespacing" 14 "x" 0 "y" 0 "font" $bold)) -}}
+    {{- $file := images.Text (printf "%s.md" .File.ContentBaseName) (dict "color" "#39c5cf" "size" 24 "x" 191 "y" 125 "font" $regular) -}}
+    {{- $img := $base.Filter $file (images.Overlay $title 90 196) -}}
+    {{- $img = $img | resources.Copy (printf "og/%s.png" .File.ContentBaseName) -}}
+    {{- $url = $img.Permalink -}}
+  {{- end -}}
+{{- end -}}
+{{- return $url -}}

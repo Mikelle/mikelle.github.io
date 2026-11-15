@@ -4,9 +4,8 @@ date: 2026-02-09
 draft: false
 description: "Adding fault tolerance with Redis leader election, PostgreSQL payload storage, and member nodes that execute blocks on their own Geth."
 tags: ["consensus", "geth", "redis", "postgres", "tutorial"]
+series: "Custom Geth Consensus"
 ---
-
-*Part 3 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
 
 A single-node consensus layer ([Part 2](/blog/single-node-consensus)) works until the node dies. This article adds Redis-based leader election for failover, PostgreSQL for durable payload storage, and member nodes that sync blocks from the leader and execute them on their own Geth instance, so each member holds a complete copy of the chain. Full source code is on [GitHub](https://github.com/mikelle/geth-consensus-tutorial/tree/main/03-member-nodes).
 

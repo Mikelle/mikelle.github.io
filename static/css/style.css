@@ -1,3 +1,31 @@
+/* IBM Plex Mono, self-hosted latin subset (SIL OFL 1.1, see /fonts/OFL.txt) */
+@font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/ibm-plex-mono-latin-400.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('../fonts/ibm-plex-mono-latin-500.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('../fonts/ibm-plex-mono-latin-700.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
     --bg: #0d1117;
     --bg-secondary: #161b22;
@@ -597,6 +625,62 @@ span.exp-company {
     margin-bottom: 0.5rem;
 }
 
+/* Series box: every part of a multi-part article, current one marked */
+.series {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+}
+
+.series ol {
+    margin: 0.5rem 0 0;
+    padding-left: 2rem;
+}
+
+.series li {
+    margin: 0.3rem 0;
+}
+
+.series li::marker {
+    color: var(--text-dim);
+}
+
+.series li.current {
+    color: var(--text);
+    font-weight: 500;
+}
+
+.series li.current::marker {
+    color: var(--green);
+}
+
+/* Previous / next part links at the end of an article */
+.series-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.series-nav a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    max-width: 48%;
+}
+
+.series-nav .comment {
+    font-size: 0.75rem;
+}
+
+.series-next {
+    margin-left: auto;
+    text-align: right;
+}
+
 /* Table of contents (collapsed by default) */
 .toc {
     background: var(--bg-secondary);
@@ -818,6 +902,14 @@ span.exp-company {
     margin-top: 1rem;
 }
 
+.footer a {
+    color: var(--text-dim);
+}
+
+.footer a:hover {
+    color: var(--blue-hover);
+}
+
 /* Terminal Input */
 .terminal-input-line {
     display: flex;
@@ -944,7 +1036,7 @@ kbd {
 
 /* Responsive */
 @media (max-width: 600px) {
-    /* The two-row header scrolls away instead of covering the screen */
+    /* The header is a single row that scrolls away with the page */
     html {
         scroll-padding-top: 1rem;
     }
@@ -952,7 +1044,10 @@ kbd {
     .terminal-header {
         position: static;
         padding: 0.5rem 1.25rem;
-        flex-wrap: wrap;
+    }
+
+    .terminal-btn {
+        display: none;
     }
 
     .terminal-title {
@@ -969,11 +1064,11 @@ kbd {
         padding: 1.5rem 1rem;
     }
 
+    /* Links wrap onto a second row only if they cannot fit beside the toggle */
     .terminal-nav {
-        order: 3;
-        width: 100%;
-        margin-left: -0.5rem;
-        margin-top: 0;
+        flex: 1 1 auto;
+        min-width: 0;
+        margin-left: -0.4rem;
         flex-wrap: wrap;
         justify-content: flex-start;
     }
@@ -982,7 +1077,26 @@ kbd {
         display: inline-flex;
         align-items: center;
         min-height: 44px;
-        padding: 0 0.5rem;
+        padding: 0 0.4rem;
+    }
+
+    /* Diagrams keep their natural size and scroll sideways, like code blocks */
+    .article-body .goat svg {
+        max-width: none;
+    }
+
+    .series-nav {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .series-nav a {
+        max-width: none;
+    }
+
+    .series-next {
+        margin-left: 0;
+        text-align: left;
     }
 
     .hero-name {

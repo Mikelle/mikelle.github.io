@@ -4,9 +4,8 @@ date: 2026-02-07
 draft: false
 description: "How to build a custom consensus layer for Geth using the Engine API - the foundation for L2 sequencers and private chains."
 tags: ["consensus", "geth", "tutorial"]
+series: "Custom Geth Consensus"
 ---
-
-*Part 1 of the Custom Geth Consensus Series* <!-- markdownlint-disable-line MD036 -->
 
 When Ethereum moved to Proof of Stake, Geth introduced the Engine API to split the execution layer from the consensus layer. It was built for beacon chain clients, but nothing stops you from putting your own consensus logic on the other end.
 
