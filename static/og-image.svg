@@ -53,16 +53,8 @@
   <text x="230" y="390" font-family="monospace" font-size="20" fill="#d29922">--oneline</text>
   <text x="360" y="390" font-family="monospace" font-size="20" fill="#39c5cf">career</text>
 
-  <!-- Current -->
-  <text x="90" y="430" font-family="monospace" font-size="16" fill="#3fb950">Infrared Finance</text>
-  <text x="270" y="430" font-family="monospace" font-size="16" fill="#a0a8b2">← now</text>
-
-  <!-- Previous -->
-  <text x="90" y="460" font-family="monospace" font-size="16" fill="#d29922">Polygon</text>
-  <text x="180" y="460" font-family="monospace" font-size="16" fill="#a0a8b2">•</text>
-  <text x="200" y="460" font-family="monospace" font-size="16" fill="#d29922">Primev</text>
-  <text x="280" y="460" font-family="monospace" font-size="16" fill="#a0a8b2">•</text>
-  <text x="300" y="460" font-family="monospace" font-size="16" fill="#d29922">Anboto Labs</text>
+  <!-- Employers, most recent first -->
+  <text x="90" y="435" font-family="monospace" font-size="16" fill="#d29922">Infrared Finance <tspan fill="#a0a8b2">•</tspan> Primev <tspan fill="#a0a8b2">•</tspan> Anboto Labs <tspan fill="#a0a8b2">•</tspan> Polygon</text>
 
   <!-- URL -->
   <text x="90" y="520" font-family="monospace" font-size="16" fill="#6e7681">mikelle.github.io</text>
