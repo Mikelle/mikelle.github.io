@@ -5,29 +5,33 @@
         <span class="prompt" aria-hidden="true">~$</span> <span class="command">whoami</span>
     </div>
     <div class="output">
-        <div class="hero-intro">
-            <h1 class="hero-name">Mikhail Wall</h1>
-        </div>
-        <div>Protocol Engineer. L2, MEV, DeFi infrastructure.</div>
+        <h1 class="hero-name">Mikhail Wall</h1>
+        <div class="hero-role">Protocol Engineer. L2, MEV, DeFi infrastructure.</div>
         <div class="hero-location">{{ .Site.Params.location }}</div>
+        <div class="hero-status">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span>Open to protocol engineering work, full-time or consulting. <a href="#contact">Get in touch</a></span>
+        </div>
+        <div class="hero-hint comment"># this page is a shell: press <kbd>/</kbd> and type 'help'</div>
     </div>
 </section>
 
 <!-- About -->
 <section id="about" class="section">
-    <div class="cmd-line">
-        <span class="prompt" aria-hidden="true">~$</span> <span class="command">cat</span> <span class="string">README.md</span>
-    </div>
+    <h2 class="cmd-line">
+        <span class="sr-only">About</span>
+        <span aria-hidden="true"><span class="prompt">~$</span> <span class="command">cat</span> <span class="string">README.md</span></span>
+    </h2>
     <div class="output">
         <p>Ten years building crypto infrastructure: exchanges, L2s, MEV, DeFi.</p>
         <p>My happy place: consensus, execution, p2p, anything distributed.</p>
         <p>Previously: DeFi infrastructure at <a href="https://infrared.finance">Infrared Finance</a>, MEV infrastructure at <a href="https://primev.xyz">Primev</a>, algorithmic trading at <a href="https://anboto.xyz">Anboto Labs</a>, core contributor to <a href="https://polygon.technology/polygon-zkevm">Polygon zkEVM</a>.</p>
-        <p>Open to protocol engineering work, full-time or consulting. See <a href="#contact">.contact</a>.</p>
     </div>
 
-    <div class="cmd-line">
-        <span class="prompt" aria-hidden="true">~$</span> <span class="command">ls</span> <span class="string">skills/</span>
-    </div>
+    <h3 class="cmd-line">
+        <span class="sr-only">Skills</span>
+        <span aria-hidden="true"><span class="prompt">~$</span> <span class="command">ls</span> <span class="string">skills/</span></span>
+    </h3>
     <div class="output">
         <div class="tree">
             <div class="tree-item"><span class="tree-branch" aria-hidden="true">├──</span> <span class="tree-dir">languages/</span> <span class="tree-file">Golang, Solidity, TypeScript, Python, Rust</span></div>
@@ -40,9 +44,10 @@
 
 <!-- Experience -->
 <section id="experience" class="section">
-    <div class="cmd-line">
-        <span class="prompt" aria-hidden="true">~$</span> <span class="command">git log</span> <span class="flag">--oneline</span> <span class="string">career</span>
-    </div>
+    <h2 class="cmd-line">
+        <span class="sr-only">Experience</span>
+        <span aria-hidden="true"><span class="prompt">~$</span> <span class="command">git log</span> <span class="flag">--oneline</span> <span class="string">career</span></span>
+    </h2>
     <div class="output">
         <div class="exp-item">
             <div class="exp-header">
@@ -127,38 +132,34 @@
 
 <!-- Projects -->
 <section id="projects" class="section">
-    <div class="cmd-line">
-        <span class="prompt" aria-hidden="true">~$</span> <span class="command">find</span> <span class="string">~/projects</span> <span class="flag">-type d</span>
-    </div>
+    <h2 class="cmd-line">
+        <span class="sr-only">Projects</span>
+        <span aria-hidden="true"><span class="prompt">~$</span> <span class="command">find</span> <span class="string">~/projects</span> <span class="flag">-type d</span></span>
+    </h2>
     <div class="output">
         <div class="project">
-            <div><span class="project-name">mev-commit</span></div>
+            <a class="project-name" href="https://github.com/primev/mev-commit"><span class="project-org">primev/</span>mev-commit</a>
             <div class="project-desc">P2P pre-confirmations, encrypted bidding, ZK proofs</div>
-            <a href="https://github.com/primev/mev-commit">github.com/primev/mev-commit</a>
         </div>
 
         <div class="project">
-            <div><span class="project-name">zkevm-node</span></div>
+            <a class="project-name" href="https://github.com/0xPolygonHermez/zkevm-node"><span class="project-org">0xPolygonHermez/</span>zkevm-node</a>
             <div class="project-desc">Polygon zkEVM sequencer, aggregator, transaction pool</div>
-            <a href="https://github.com/0xPolygonHermez/zkevm-node">github.com/0xPolygonHermez/zkevm-node</a>
         </div>
 
         <div class="project">
-            <div><span class="project-name">hermez-node</span></div>
+            <a class="project-name" href="https://github.com/hermeznetwork/hermez-node"><span class="project-org">hermeznetwork/</span>hermez-node</a>
             <div class="project-desc">Hermez Network L2 rollup node: coordinator, synchronizer, API</div>
-            <a href="https://github.com/hermeznetwork/hermez-node">github.com/hermeznetwork/hermez-node</a>
         </div>
 
         <div class="project">
-            <div><span class="project-name">go-safe-tx</span></div>
+            <a class="project-name" href="https://github.com/Mikelle/go-safe-tx"><span class="project-org">Mikelle/</span>go-safe-tx</a>
             <div class="project-desc">Go client for the Safe Transaction Service API: propose, batch, query pending txs</div>
-            <a href="https://github.com/Mikelle/go-safe-tx">github.com/Mikelle/go-safe-tx</a>
         </div>
 
         <div class="project">
-            <div><span class="project-name">geth-consensus-tutorial</span></div>
+            <a class="project-name" href="https://github.com/mikelle/geth-consensus-tutorial"><span class="project-org">mikelle/</span>geth-consensus-tutorial</a>
             <div class="project-desc">Custom consensus layers for Geth: Engine API, Redis leader election, CometBFT</div>
-            <a href="https://github.com/mikelle/geth-consensus-tutorial">github.com/mikelle/geth-consensus-tutorial</a>
         </div>
     </div>
 </section>
@@ -167,17 +168,21 @@
 {{ $blogPages := where .Site.RegularPages "Section" "blog" }}
 {{ if $blogPages }}
 <section class="section">
-    <div class="cmd-line">
-        <span class="prompt" aria-hidden="true">~$</span> <span class="command">ls</span> <span class="string">blog/</span>
-    </div>
+    <h2 class="cmd-line">
+        <span class="sr-only">Blog</span>
+        <span aria-hidden="true"><span class="prompt">~$</span> <span class="command">ls</span> <span class="string">blog/</span></span>
+    </h2>
     <div class="output">
-        {{ range first 3 $blogPages }}
+        {{ range first 5 $blogPages }}
         <div class="blog-item">
             <span class="blog-status">[{{ if .Draft }}draft{{ else }}{{ .Date.Format "2006.01.02" }}{{ end }}]</span>
-            <span class="blog-title"><a href="{{ .Permalink }}">{{ .Title }}</a></span>
+            <div class="blog-title">
+                <a href="{{ .Permalink }}">{{ .Title }}</a>
+                {{ with .Description }}<div class="blog-desc">{{ . }}</div>{{ end }}
+            </div>
         </div>
         {{ end }}
-        {{ if gt (len $blogPages) 3 }}
+        {{ if gt (len $blogPages) 5 }}
         <div class="more-link">
             <a href="/blog/">more →</a>
         </div>
@@ -190,9 +195,10 @@
 {{ $notesPages := where .Site.RegularPages "Section" "notes" }}
 {{ if $notesPages }}
 <section class="section">
-    <div class="cmd-line">
-        <span class="prompt" aria-hidden="true">~$</span> <span class="command">tail</span> <span class="flag">-n 3</span> <span class="string">notes.log</span>
-    </div>
+    <h2 class="cmd-line">
+        <span class="sr-only">Notes</span>
+        <span aria-hidden="true"><span class="prompt">~$</span> <span class="command">tail</span> <span class="flag">-n 3</span> <span class="string">notes.log</span></span>
+    </h2>
     <div class="output">
         {{ range first 3 $notesPages }}
         <div class="blog-item">
@@ -211,9 +217,10 @@
 
 <!-- Interests -->
 <section id="interests" class="section">
-    <div class="cmd-line">
-        <span class="prompt" aria-hidden="true">~$</span> <span class="command">cat</span> <span class="string">.interests</span>
-    </div>
+    <h2 class="cmd-line">
+        <span class="sr-only">Interests</span>
+        <span aria-hidden="true"><span class="prompt">~$</span> <span class="command">cat</span> <span class="string">.interests</span></span>
+    </h2>
     <div class="output">
         <div class="tree">
             <div class="tree-item"><span class="tree-branch" aria-hidden="true">├──</span> <span class="tree-dir">gym/</span> <span class="tree-file">lifting heavy things, putting them back down</span></div>
@@ -226,9 +233,10 @@
 
 <!-- Contact -->
 <section id="contact" class="section">
-    <div class="cmd-line">
-        <span class="prompt" aria-hidden="true">~$</span> <span class="command">cat</span> <span class="string">.contact</span>
-    </div>
+    <h2 class="cmd-line">
+        <span class="sr-only">Contact</span>
+        <span aria-hidden="true"><span class="prompt">~$</span> <span class="command">cat</span> <span class="string">.contact</span></span>
+    </h2>
     <div class="output">
         <div class="contact-row">
             <span class="contact-label">email</span>

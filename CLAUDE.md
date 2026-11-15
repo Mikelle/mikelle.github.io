@@ -19,7 +19,7 @@ There are no tests or linters.
 
 ## Architecture
 
-- `config.toml` — site config, params (author/social links), and the main menu. Homepage nav items are anchors (`#about`, `#experience`, ...) into `layouts/index.html`; `blog` and `notes` are separate sections.
+- `config.toml` — site config, params (author/social links), and the main menu. Homepage nav items are anchors (`#about`, `#experience`, ...) into `layouts/index.html`; `blog` and `notes` are separate sections. The header nav renders on every page (anchors get a leading `/` off the homepage) and hides `notes` while that section has no published pages.
 - `content/blog/` — long-form articles; `content/notes/` — short thoughts. Front matter: `title`, `date`, `draft`, `description`, `tags`.
 - `layouts/_default/baseof.html` — base shell; `partials/header.html` and `footer.html`; per-section list templates in `layouts/blog/` and `layouts/notes/`.
 - `layouts/_default/_markup/render-codeblock-goat.html` — code fences tagged `goat` are rendered at build time into SVG diagrams via Hugo's `diagrams.Goat`. GoAT quirks learned the hard way: arrows need a shaft of at least two dashes (`-->`, not `->`) to render, and box borders must be exactly aligned column-wise or the diagram breaks.

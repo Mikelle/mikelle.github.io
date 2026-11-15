@@ -229,7 +229,7 @@
         draw();
     }
 
-    // Load saved background on page load (default: particles)
+    // Load saved background on page load (off unless chosen via the `bg` command)
     // Respect reduced motion preference
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -238,8 +238,7 @@
         return;
     }
 
-    const saved = localStorage.getItem('bg');
-    const bg = saved !== null ? saved : 'particles';
+    const bg = localStorage.getItem('bg');
     if (bg && bg !== 'none') {
         setBackground(bg);
     }

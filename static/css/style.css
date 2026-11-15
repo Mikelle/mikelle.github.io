@@ -125,6 +125,8 @@
 
 html {
     scroll-behavior: smooth;
+    /* Keep anchor targets clear of the sticky header */
+    scroll-padding-top: 5rem;
 }
 
 body {
@@ -172,19 +174,24 @@ body {
 
 a {
     color: var(--blue);
-    text-decoration: none;
-    transition: color 0.15s;
+    /* Links are underlined so they don't rely on colour alone */
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+    transition: color 0.15s, text-decoration-color 0.15s;
 }
 
 a:hover {
     color: var(--blue-hover);
-    text-decoration: none;
+    text-decoration-color: currentColor;
 }
 
 a:focus-visible,
-.theme-toggle:focus-visible,
+button:focus-visible,
+summary:focus-visible,
 .terminal-input:focus-visible {
-    outline: 1px solid var(--accent);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
     border-radius: 2px;
 }
@@ -212,6 +219,7 @@ a:focus-visible,
     width: 12px;
     height: 12px;
     border-radius: 50%;
+    flex-shrink: 0;
 }
 
 .terminal-btn.red { background: var(--red); }
@@ -222,11 +230,17 @@ a:focus-visible,
     margin-left: 1rem;
     color: var(--text-dim);
     font-size: 0.8rem;
+    /* Long article titles truncate instead of pushing the nav off-screen */
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .terminal-nav {
     margin-left: auto;
     display: flex;
+    flex-shrink: 0;
     gap: 0;
 }
 
@@ -278,6 +292,9 @@ a:focus-visible,
     font-size: 1rem;
     padding: 0.25rem;
     margin-left: 1rem;
+    min-width: 2rem;
+    min-height: 2rem;
+    flex-shrink: 0;
     transition: color 0.15s;
 }
 
@@ -327,6 +344,8 @@ a:focus-visible,
 
 .cmd-line {
     margin-bottom: 1rem;
+    font-size: 1rem;
+    font-weight: 400;
 }
 
 .output {
@@ -353,7 +372,8 @@ a:focus-visible,
 }
 
 .tree-dir {
-    color: var(--blue);
+    color: var(--text);
+    flex-shrink: 0;
 }
 
 .tree-file {
@@ -385,8 +405,9 @@ a:focus-visible,
     font-weight: 500;
 }
 
-.exp-company {
-    color: var(--blue);
+/* Companies without a link read as plain text; blue is reserved for links */
+span.exp-company {
+    color: var(--text);
 }
 
 .exp-date {
@@ -406,7 +427,8 @@ a:focus-visible,
 }
 
 .tag {
-    color: var(--yellow);
+    color: var(--text-dim);
+    font-size: 0.8rem;
 }
 
 .tag::before {
@@ -420,8 +442,12 @@ a:focus-visible,
 }
 
 .project-name {
-    color: var(--cyan);
     font-weight: 500;
+}
+
+.project-org {
+    color: var(--text-dim);
+    font-weight: 400;
 }
 
 .project-desc {
@@ -433,16 +459,23 @@ a:focus-visible,
 .blog-item {
     display: flex;
     gap: 1rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
 }
 
 .blog-status {
-    color: var(--yellow);
+    color: var(--text-dim);
     min-width: 80px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .blog-title {
     color: var(--text);
+}
+
+.blog-desc {
+    color: var(--text-dim);
+    margin-top: 0.25rem;
 }
 
 /* Article list */
@@ -457,7 +490,7 @@ a:focus-visible,
 }
 
 .article-status {
-    color: var(--yellow);
+    color: var(--text-dim);
     font-size: 0.75rem;
     margin-bottom: 0.5rem;
 }
@@ -510,7 +543,7 @@ a:focus-visible,
 }
 
 .log-date {
-    color: var(--yellow);
+    color: var(--text-dim);
     font-size: 0.85rem;
     margin-bottom: 0.75rem;
 }
@@ -606,8 +639,13 @@ a:focus-visible,
 .article-body {
     color: var(--text);
     font-family: var(--font-prose);
-    font-size: 0.9375rem;
-    line-height: 1.8;
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+/* Cap the reading measure for prose; code, diagrams and tables keep the full width */
+.article-body > :is(p, ul, ol, blockquote, h2, h3, h4) {
+    max-width: 36rem;
 }
 
 /* Keep terminal/code elements monospaced within prose */
@@ -620,14 +658,16 @@ a:focus-visible,
 
 .article-body h2 {
     color: var(--cyan);
-    font-size: 1.1rem;
-    margin: 2rem 0 1rem;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    margin: 2.5rem 0 1rem;
 }
 
 .article-body h3 {
     color: var(--text);
-    font-size: 1rem;
-    margin: 1.5rem 0 0.75rem;
+    font-size: 1.0625rem;
+    line-height: 1.4;
+    margin: 1.75rem 0 0.75rem;
 }
 
 .article-body p {
@@ -686,8 +726,16 @@ a:focus-visible,
     z-index: 1;
 }
 
-.article-body .highlight:hover .copy-btn {
+.article-body .highlight:hover .copy-btn,
+.copy-btn:focus-visible {
     opacity: 1;
+}
+
+/* Touch devices have no hover, so the button stays visible */
+@media (hover: none) {
+    .copy-btn {
+        opacity: 1;
+    }
 }
 
 .copy-btn:hover {
@@ -698,6 +746,7 @@ a:focus-visible,
 .article-body pre code {
     background: none;
     padding: 0;
+    font-size: 0.85rem;
 }
 
 .article-body table {
@@ -789,7 +838,7 @@ a:focus-visible,
 
 .terminal-input::placeholder {
     color: var(--text-dim);
-    opacity: 0.5;
+    opacity: 1;
 }
 
 .terminal-output {
@@ -815,9 +864,46 @@ a:focus-visible,
 }
 
 /* Hero */
-.hero-intro { margin-bottom: 1rem; }
-.hero-name { color: var(--text); font-size: 1.1rem; }
-.hero-location { color: var(--text-dim); margin-top: 0.5rem; }
+.hero-name {
+    color: var(--text);
+    font-size: 2.25rem;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+}
+
+.hero-role { font-size: 1rem; }
+.hero-location { color: var(--text-dim); margin-top: 0.25rem; }
+
+.hero-status {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+}
+
+.status-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--green);
+    flex-shrink: 0;
+}
+
+.hero-hint {
+    margin-top: 1.25rem;
+    font-size: 0.8rem;
+}
+
+kbd {
+    font-family: inherit;
+    font-size: 0.9em;
+    padding: 0.05rem 0.35rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg-secondary);
+    color: var(--text);
+}
 
 /* Section "more" link + empty states */
 .more-link { margin-top: 1rem; }
@@ -829,7 +915,8 @@ a:focus-visible,
 
 /* Single article title + footer */
 .article-header .article-title {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
+    line-height: 1.3;
     margin-top: 0.5rem;
 }
 
@@ -857,8 +944,14 @@ a:focus-visible,
 
 /* Responsive */
 @media (max-width: 600px) {
+    /* The two-row header scrolls away instead of covering the screen */
+    html {
+        scroll-padding-top: 1rem;
+    }
+
     .terminal-header {
-        padding: 1rem 1.25rem;
+        position: static;
+        padding: 0.5rem 1.25rem;
         flex-wrap: wrap;
     }
 
@@ -868,6 +961,8 @@ a:focus-visible,
 
     .theme-toggle {
         margin-left: auto;
+        min-width: 44px;
+        min-height: 44px;
     }
 
     .terminal-body {
@@ -877,14 +972,31 @@ a:focus-visible,
     .terminal-nav {
         order: 3;
         width: 100%;
-        margin-left: 0;
-        margin-top: 0.5rem;
+        margin-left: -0.5rem;
+        margin-top: 0;
         flex-wrap: wrap;
         justify-content: flex-start;
     }
 
     .terminal-nav a {
-        padding: 0.25rem 0.5rem;
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 0 0.5rem;
+    }
+
+    .hero-name {
+        font-size: 1.75rem;
+    }
+
+    /* The terminal prompt is desktop-only, so its hint is too */
+    .hero-hint {
+        display: none;
+    }
+
+    .blog-item {
+        flex-direction: column;
+        gap: 0.15rem;
     }
 
     .terminal-nav::after {
